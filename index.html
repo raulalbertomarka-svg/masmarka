@@ -160,8 +160,8 @@
         });
     }
 
-    async function guardar() {
-    // --- USA TU URL DE IMPLEMENTACIÓN AQUÍ ---
+ async function guardar() {
+    // --- URL DE IMPLEMENTACIÓN ---
     const url = "https://script.google.com/macros/s/AKfycbwW_-E1Poz6TUcrE8UjMhjg0edRP3k7Bbh8MUKzr27Tn5ss3NOKES5UNJGE8xsiAtZKUQ/exec";
     
     const btn = document.getElementById('btn-envio');
@@ -179,13 +179,18 @@
     
     // Captura productos de lista
     document.querySelectorAll('.item-carne').forEach(div => {
-        const reg = div.querySelector('.p-regular').value;
-        const off = div.querySelector('.p-oferta').value;
-        if(regular || oferta) {
+        // CORRECCIÓN: Usamos p-reg y p-off que son las clases que suelen tener tus inputs
+        const regInput = div.querySelector('.p-reg'); 
+        const offInput = div.querySelector('.p-off');
+        
+        const valorReg = regInput ? regInput.value : "";
+        const valorOff = offInput ? offInput.value : "";
+
+        if(valorReg || valorOff) {
             items.push({ 
                 corte: div.querySelector('span').innerText, 
-                precioReg: regular || 0, 
-                precioOff: oferta || 0, 
+                precioReg: valorReg || 0, 
+                precioOff: valorOff || 0, 
                 esNuevo: false 
             });
         }
@@ -206,7 +211,10 @@
         }
     });
 
-    if(!relevador || !local || items.length === 0) return alert("Completa Relevador, Local y carga algún precio.");
+    // Validación antes de enviar
+    if(!relevador || !local || items.length === 0) {
+        return alert("Error: Debes completar Relevador, Local y al menos un precio.");
+    }
 
     btn.disabled = true;
     btn.innerHTML = "ENVIANDO...";
@@ -221,14 +229,14 @@
                 fecha: new Date().toLocaleString(), 
                 relevador: relevador, 
                 local: local, 
-                categoria: categoriaFinal, // Enviamos la categoría calculada
+                categoria: categoriaFinal,
                 items: items 
             }) 
         });
         alert("¡Relevamiento enviado con éxito!");
         location.reload();
     } catch(e) { 
-        alert("Error de envío. Revisa tu internet."); 
+        alert("Error de envío. Revisa tu conexión."); 
         btn.disabled = false;
         btn.innerHTML = "ENVIAR RELEVAMIENTO";
     }

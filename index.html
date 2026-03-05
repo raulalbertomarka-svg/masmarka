@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MasMarkaAPP Envasados</title>
+    <title>MASMARKA ENVASADOS</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
@@ -17,7 +17,12 @@
         .tab.active-gen { background: var(--primary); color: white; }
         .tab.active-big { background: var(--biggie); color: white; }
         label { font-size: 11px; color: var(--primary); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 5px; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box; font-size: 16px; margin-bottom: 10px; background: white; }
+        
+        input, select { width: 100%; padding: 12px; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box; font-size: 16px; margin-bottom: 5px; background: white; transition: all 0.2s; }
+        
+        .input-error { border: 2px solid #d32f2f !important; background-color: #fff8f8 !important; }
+        .error-msg { color: #d32f2f; font-size: 10px; font-weight: bold; margin-bottom: 10px; display: block; min-height: 12px; }
+        
         .btn-add { background: var(--secondary); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; }
         .item-carne { border-bottom: 1px solid #eee; padding: 12px 0; }
         .item-carne span { font-weight: bold; display: block; margin-bottom: 8px; font-size: 14px; color: #333; }
@@ -30,7 +35,7 @@
 </head>
 <body>
 
-<header>RELEVAMIENTO MASMARKAPP ENVASADOS</header>
+<header>RELEVAMIENTO MASMARKA ENVASADOS</header>
 
 <main>
     <div class="tipo-selector">
@@ -42,7 +47,6 @@
         <label>Relevador General</label>
         <input type="text" id="relevador_gen" list="dl-relevadores" placeholder="Tu nombre...">
         <datalist id="dl-relevadores"></datalist>
-
         <label>Local</label>
         <input type="text" id="local_gen" list="dl-locales" placeholder="Buscar local...">
         <datalist id="dl-locales"></datalist>
@@ -80,20 +84,7 @@
 
 <script>
     let modoActual = 'gen';
-    // --- DATOS DE BIGGIE ---
-    const datos_biggie = {
-        "MAGNO MARTINEZ": ["Fernando 11 de Septiembre", "San Lorenzo Campo Jordan", "San Lorenzo Manuel Ortiz Guerrero", "calle i", "Fernando IPS Ingavi", "Fernando Mariscal Estigarribia", "San Lorenzo Avelino Martinez", "San Lorenzo De la Victoria", "San Lorenzo Catedral", "San Lorenzo Ruta 1 y 2.NO", "San Lorenzo Pastora Cespedes", "Fernando Leopardí.NO", "Ingavi Platanillo", "Ciclovia", "14 Y MEDIO", "UNA", "CNEL CAZAL", "Victorio Curiel", "Mariscal lopez Ingevi", "SAN PEDRO", "POSTA YBYCUA", "JA SALDIVAR TRES BOCAS", "Brumado", "Laguna grande", "San Lorenzo PELLÓN", "CAMINERA", "JATAITY", "LUCERITO", "ISLA PO I"],
-        "ALEJANDRO VAZQUEZ": ["Peron Cerro Lambare", "PERON Y FELIX BOGADO", "Pirizal", "Lambare 1ro de marzo", "Lambare Avenida del Yacht", "Lambare Bruno Guggiari", "pizarro", "Independencia Nacional y Quinta", "Quinta y Parapiti", "Aranjuez", "Pozo Favorito", "PUERTO PABLA", "San Vicente Iglesia", "Lambare Bruno Guggiari San Rafael", "Lambare Carretera de Lopez", "Bruno Guggiari Pinoza", "Lambare Century Plaza", "Lambare San Isidro", "Medicos del Chaco c/Nuñez de Balboa", "Lambare Argaa", "Barrio Obrero hospital", "BIGGIE EEU OBRERO", "LAMBARE ROA BASTOS", "Biggie Municipal"],
-        "FERNANDO PENAYO": ["Antonio San Francisco", "Villa Elisa Von Poleski", "Villa Elisa Von Poleski y Dr. Francia", "BIGGIE CAAGUAZU", "4 mojon", "villa elisa ciclovia picada", "san ntonio centro", "RINCON", "Capilla del monte", "MOISES BERTONI", "Biggie Villa elisa Petropar", "SAN CARLOS", "SAN ANTONIO YTORORO", "ÑEMBY CENTRO", "Cañadita", "valle apua", "biggie ypane", "jacare valija", "Acceso Sur", "BIGGIE DEFENSORES", "BIGGGIE TORIBIO"],
-        "MATIAS RODRIGUEZ": ["Zavala Cue Norte", "Fernando Soldado Ovelar y Panchito", "Zavala Cue SUR", "BOGGIANI Y ALAS PARAGUAYAS", "Mariscal Lopez Municipalidad", "Hipodromo", "Abasto", "san pablo", "mcal lopez y tte malutin", "BIGGIE RECOLETA", "BIGGIE SAN CRISTOBAL", "España casi tte malutin", "San lorenzo avda la victoria", "San lorenzo 14 de mayo", "España y san rafael", "San martin y austria", "Boggiani y facundo machain"],
-        "FABRICIO SAMANIEGO": ["BARTOLOME DE LAS CASAS", "VALLE PUCU", "CHOFERES Y JULIANA INSFRAN", "BIGGIE AREGUA CAACUPEMI", "FERNANDO MADAME LYNCH", "LUQUE PRIMAVERA", "PEDRO PENA", "R.I. 18 PITIANTUTA", "ARAUCANOS", "BIGGIE GHA", "CAMPO VIA", "SEIFERHELD", "ISLA BOGADO", "RIO VERDE", "BIGGIE TRINITY", "BIGGIE MUNICIPALIDAD LUQUE", "BIGGIE CAÑADA", "BARTOLOME Y FERNANDO DE LA MORA PERO PIDIERON", "LUQUE AREGUA", "MEDICOS DEL CHACO C/INCA", "MARAMBURE", "ORTIZ GUERRERO ", "TERMINAL", "CUARTO BARRIO"],
-        "ELIAS ESCOBAR": ["SAN BERNARDINO AQUA", "SAN BERNARDINO CASINO", "SAN BERNARDINO COYOTE- 2 ", "SAN BERNARDINO LAGO AZUL", "SAN BERNARDINO KENNEDY ", "YPACARAI PEAJE", "CAACUPÉ CURVA", "CAACUPE CENTRO", "SANTA CATALINA", "ROJAS CAÑADA", "SAN MIGUEL", "YPACARAI RUTA 2", "DR LOPEZ", "ITA CENTRO", "ITAUGUA", "ITAUGUA", "ITAUGUA GENARO RODRIGUEZ", "ITA SAN BLAS", "CAPIATA LAURETY", "ESTUDIANTE CAPIATEÑO"],
-        "BLAS PAREDES": ["CENTENARIO ESPAÑA", "GAUDIOSO NUÑEZ", "HERRERA Y GRAL SANTOS ", "ESPAÑA SAN JOSE", "COLON Y HAEDO", "RODRIGUEZ DE FRANCIA ", "YGATYMI Y MONTEVIDEO", "CAL - DEFENSORES DEL CHACO", "PALMA", "ESTRELLA ", "SAJONIA LA ENCARNACION", "CARLOS ANTONIO LOPEZ-", "ANA DIAZ", "CHILE Y PIRIBEBUY", "PACHECO", "DE LAS PALMERAS", "KUBITSCHEK SEMINARIO", "LILIO VILLA MORRA", "LOS LAURELES", "TEODORO S. MONGELOS", "AZARA Y EEUU"],
-        "CRISTINO SAMANIEGO": ["GENERAL GARAY ", "LUQUE ALFARO", "LUQUE AMERICA", "LUQUE CENTRO", "ROJAS SILVA", "FERNANDO 3 FRONTERAS", "LUQUE DE LA RESIDENTA", "LUQUE ELIZARDO AQUINO", "LUQUE ESTADIO ", "LUQUE GARDEN ", "MARENA", "SAN LORENZO MONTOYA ", "LUQUE MORA CUE", "LUQUE ROSARIO", "LUQUE NANAWA", "TUPA REKAVO", "BRITEZ BORGES", "LUQUE SANBER- ARIELITO", "PALMA LOMA", "VILLA POLICIAL", "AEROPUERTO", "LUQUE SEGUNDA CAPITAL"],
-        "DAYSI GAONA": ["Aviadores", "Itapua", "las mercedes- washington", "Molas Lopez Lomas", "San Martin Lomas", "Mariscal lopez y peru", "dominicana", "Mburukuya", "Santa Teresa", "San Martin y Bruselas", "Trinidad Campo Grande", "Primer Presidente", "Via Ferrea", "Artigas La Costa", "Federacion Rusa", "RCA DE SIRIA", "Brasilia Americana"],
-        "ALICIA OJEDA": ["Genaro Romero", "Sacramento e Itapua", "Sargento Gauto", "Venezuela", "Biggie Semidei", "MRA GRAL. Bernardino Caballero", "MRA Nanawa", "Biggie Caballeria", "Lombardo Loma Pyta", "Arecayá", "Loma Pyta 2", "Remansito", "Shopping Mariano", "Mariano Roque Alonso centro", "MRA la concordia", "MRA transchaco", "MRA portal", "Zeballos cue", "Limpio centro", "Limpio Abasto Norte", "Limpio pinedo", "Limpio sur"]
-    };
-
+    const datos_biggie = { "MAGNO MARTINEZ": ["Fernando 11 de Septiembre", "San Lorenzo Campo Jordan", "San Lorenzo Manuel Ortiz Guerrero", "calle i", "Fernando IPS Ingavi", "Fernando Mariscal Estigarribia", "San Lorenzo Avelino Martinez", "San Lorenzo De la Victoria", "San Lorenzo Catedral", "San Lorenzo Ruta 1 y 2.NO", "San Lorenzo Pastora Cespedes", "Fernando Leopardí.NO", "Ingavi Platanillo", "Ciclovia", "14 Y MEDIO", "UNA", "CNEL CAZAL", "Victorio Curiel", "Mariscal lopez Ingevi", "SAN PEDRO", "POSTA YBYCUA", "JA SALDIVAR TRES BOCAS", "Brumado", "Laguna grande", "San Lorenzo PELLÓN", "CAMINERA", "JATAITY", "LUCERITO", "ISLA PO I"], "ALEJANDRO VAZQUEZ": ["Peron Cerro Lambare", "PERON Y FELIX BOGADO", "Pirizal", "Lambare 1ro de marzo", "Lambare Avenida del Yacht", "Lambare Bruno Guggiari", "pizarro", "Independencia Nacional y Quinta", "Quinta y Parapiti", "Aranjuez", "Pozo Favorito", "PUERTO PABLA", "San Vicente Iglesia", "Lambare Bruno Guggiari San Rafael", "Lambare Carretera de Lopez", "Bruno Guggiari Pinoza", "Lambare Century Plaza", "Lambare San Isidro", "Medicos del Chaco c/Nuñez de Balboa", "Lambare Argaa", "Barrio Obrero hospital", "BIGGIE EEU OBRERO", "LAMBARE ROA BASTOS", "Biggie Municipal"], "FERNANDO PENAYO": ["Antonio San Francisco", "Villa Elisa Von Poleski", "Villa Elisa Von Poleski y Dr. Francia", "BIGGIE CAAGUAZU", "4 mojon", "villa elisa ciclovia picada", "san ntonio centro", "RINCON", "Capilla del monte", "MOISES BERTONI", "Biggie Villa elisa Petropar", "SAN CARLOS", "SAN ANTONIO YTORORO", "ÑEMBY CENTRO", "Cañadita", "valle apua", "biggie ypane", "jacare valija", "Acceso Sur", "BIGGIE DEFENSORES", "BIGGGIE TORIBIO"], "MATIAS RODRIGUEZ": ["Zavala Cue Norte", "Fernando Soldado Ovelar y Panchito", "Zavala Cue SUR", "BOGGIANI Y ALAS PARAGUAYAS", "Mariscal Lopez Municipalidad", "Hipodromo", "Abasto", "san pablo", "mcal lopez y tte malutin", "BIGGIE RECOLETA", "BIGGIE SAN CRISTOBAL", "España casi tte malutin", "San lorenzo avda la victoria", "San lorenzo 14 de mayo", "España y san rafael", "San martin y austria", "Boggiani y facundo machain"], "FABRICIO SAMANIEGO": ["BARTOLOME DE LAS CASAS", "VALLE PUCU", "CHOFERES Y JULIANA INSFRAN", "BIGGIE AREGUA CAACUPEMI", "FERNANDO MADAME LYNCH", "LUQUE PRIMAVERA", "PEDRO PENA", "R.I. 18 PITIANTUTA", "ARAUCANOS", "BIGGIE GHA", "CAMPO VIA", "SEIFERHELD", "ISLA BOGADO", "RIO VERDE", "BIGGIE TRINITY", "BIGGIE MUNICIPALIDAD LUQUE", "BIGGIE CAÑADA", "BARTOLOME Y FERNANDO DE LA MORA PERO PIDIERON", "LUQUE AREGUA", "MEDICOS DEL CHACO C/INCA", "MARAMBURE", "ORTIZ GUERRERO ", "TERMINAL", "CUARTO BARRIO"], "ELIAS ESCOBAR": ["SAN BERNARDINO AQUA", "SAN BERNARDINO CASINO", "SAN BERNARDINO COYOTE- 2 ", "SAN BERNARDINO LAGO AZUL", "SAN BERNARDINO KENNEDY ", "YPACARAI PEAJE", "CAACUPÉ CURVA", "CAACUPE CENTRO", "SANTA CATALINA", "ROJAS CAÑADA", "SAN MIGUEL", "YPACARAI RUTA 2", "DR LOPEZ", "ITA CENTRO", "ITAUGUA", "ITAUGUA", "ITAUGUA GENARO RODRIGUEZ", "ITA SAN BLAS", "CAPIATA LAURETY", "ESTUDIANTE CAPIATEÑO"], "BLAS PAREDES": ["CENTENARIO ESPAÑA", "GAUDIOSO NUÑEZ", "HERRERA Y GRAL SANTOS ", "ESPAÑA SAN JOSE", "COLON Y HAEDO", "RODRIGUEZ DE FRANCIA ", "YGATYMI Y MONTEVIDEO", "CAL - DEFENSORES DEL CHACO", "PALMA", "ESTRELLA ", "SAJONIA LA ENCARNACION", "CARLOS ANTONIO LOPEZ-", "ANA DIAZ", "CHILE Y PIRIBEBUY", "PACHECO", "DE LAS PALMERAS", "KUBITSCHEK SEMINARIO", "LILIO VILLA MORRA", "LOS LAURELES", "TEODORO S. MONGELOS", "AZARA Y EEUU"], "CRISTINO SAMANIEGO": ["GENERAL GARAY ", "LUQUE ALFARO", "LUQUE AMERICA", "LUQUE CENTRO", "ROJAS SILVA", "FERNANDO 3 FRONTERAS", "LUQUE DE LA RESIDENTA", "LUQUE ELIZARDO AQUINO", "LUQUE ESTADIO ", "LUQUE GARDEN ", "MARENA", "SAN LORENZO MONTOYA ", "LUQUE MORA CUE", "LUQUE ROSARIO", "LUQUE NANAWA", "TUPA REKAVO", "BRITEZ BORGES", "LUQUE SANBER- ARIELITO", "PALMA LOMA", "VILLA POLICIAL", "AEROPUERTO", "LUQUE SEGUNDA CAPITAL"], "DAYSI GAONA": ["Aviadores", "Itapua", "las mercedes- washington", "Molas Lopez Lomas", "San Martin Lomas", "Mariscal lopez y peru", "dominicana", "Mburukuya", "Santa Teresa", "San Martin y Bruselas", "Trinidad Campo Grande", "Primer Presidente", "Via Ferrea", "Artigas La Costa", "Federacion Rusa", "RCA DE SIRIA", "Brasilia Americana"], "ALICIA OJEDA": ["Genaro Romero", "Sacramento e Itapua", "Sargento Gauto", "Venezuela", "Biggie Semidei", "MRA GRAL. Bernardino Caballero", "MRA Nanawa", "Biggie Caballeria", "Lombardo Loma Pyta", "Arecayá", "Loma Pyta 2", "Remansito", "Shopping Mariano", "Mariano Roque Alonso centro", "MRA la concordia", "MRA transchaco", "MRA portal", "Zeballos cue", "Limpio centro", "Limpio Abasto Norte", "Limpio pinedo", "Limpio sur"] };
     const relevadores_gen = ["BLAS LEIVA", "JUAN ZORONDO", "CARMEN LEIVA", "PEDRO YUDICE", "HECTOR ACEVEDO", "JOSE NUÑEZ", "PERLA AQUINO", "ERIKA ESPINOLA", "FLORENCIA CACERES", "MATIAS NUÑEZ", "GABRIELA CACERES", "LETICIA BARRIOS", "KORBIN MERELES", "VIDAL OZORIO", "JULIO NUÑEZ", "DERLIS BRITEZ", "JOSUE CABALLERO", "DIANA", "ROBERTO CLIVIO"];
     const locales_gen = ["AHO AHO", "ARETE LAMBARE", "ARETE PINEDO", "ARETE PRIMER PRESIDENTE", "ARETE SAUSALITO", "BIGGIE VILLA HAYES", "BOX ABASTO", "BOX ARATIRI R2", "BOX CAPIATA R1", "BOX LUQUE", "BOX MARIANO", "BOX MOG", "CASA RICA ESPAÑA", "CASA RICA LAURELES", "CASA RICA MOLAS", "CASA RICA PERSEVERANCIA", "DELIMARKET", "HIPERSEIS", "LA BOMBA AREGUA", "LA BOMBA ÑEMBY", "LA BOMBA PROCERES", "LA BOMBA SANTA TERESA", "LA BOMBA TERMINAL", "LA BOMBA VIA FERREA", "LOS JARDINES JACARANDA", "LOS JARDINES LAGUNA GRANDE", "LOS JARDINES MORA CUE", "LOS JARDINES PRIMAVERA", "LOS JARDINES SAN LORENZO", "LOS JARDINES SPAR", "LOS JARDINES VILLA ADELA", "LUISITO 4 MOJONES", "LUISITO CAPIATA", "LUISITO EUSEBIO AYALA", "LUISITO FELIX BOGADO", "LUISITO ITAUGUA", "LUISITO LIMPIO", "LUISITO LUQUE", "LUISITO MARIANO", "LUISITO ÑEMBY", "LUISITO SAN LORENZO", "LUISITO VILLA ELISA", "LUISITO YPANES", "S6 AREGUA", "S6 CAMBA CUA", "S6 DENIS ROA", "S6 EXPRESS MOLAS", "S6 EXPRESS PRIMER PRESIDENTE", "S6 EXPRESS RI BOQUERON", "S6 FERNANDO", "S6 GRAN UNION", "S6 JAPON", "S6 LA NEGRITA", "S6 LAMBARE", "S6 LAURELTY", "S6 LOS LAURELES", "S6 MADERO", "S6 MBURUCUYA", "S6 SAN LORENZO", "S6 TOTAL", "S6 VILLA MORRA", "SALEMMA CARMELITAS", "SALEMMA FUENTE", "SALEMMA MULTIPLAZA", "SALEMMA SAN LORENZO", "STOCK 14 Y MEDIO", "STOCK ACCESO SUR", "STOCK AGRONOMO", "STOCK ARTIGAS", "STOCK AVELINO", "STOCK BARRIO OBRERO", "STOCK BOQUERON", "STOCK BRASILIA 1", "STOCK BRASILIA 2", "STOCK BRITEZ BORGES", "STOCK CAACUPE 1", "STOCK CAACUPE 2", "STOCK CALLE I", "STOCK CAPIATA R1", "STOCK CAPIATA R2", "STOCK CARRETERA", "STOCK DEFENSORES", "STOCK DOÑA BERTA", "STOCK EPXRESS 10 de AGOSTO", "STOCK EXPRES FIGUEROA", "STOCK EXPRES TTE MOLAS", "STOCK EXPRESS ACOSTA ÑU", "STOCK EXPRESS AMERICO PICCO", "STOCK EXPRESS AVDA PARAGUAY"];
     const cortes = ["BIFE DE CHORIZO - CHORTI", "BIFE DE CHORIZO – PAMPA GOLD", "BIFE DE CHORIZO – FERHEIM", "BIFE DE CHORIZO - CONCEPCIÓN", "BIFE DE CHORIZO – QUINTA POTRERO", "OJO DE BIFE – BRAFORD (VICTORIA)", "BIFE DE CHORIZO – PUL SELECCIÓN (ETIQUETA NEGRA)", "BIFE DE CHORIZO – ESTANCIA 92 ANGUS", "BIFE DE CHORIZO – ESTANCIA 92", "BIFE DE CHORIZO - DON PEPE", "BIFE DE CHORIZO - FRIGOCHACO", "BIFE DE CHORIZO - NEULAND", "BIFE DE CHORIZO - CAMPO 9", "BIFE DE CHORIZO - VICTORIA", "BIFE DE VACÍO PUL SELECCIÓN (ETIQUETA NEGRA)", "BIFE ANCHO PUL REGULAR (ETIQUETA AZUL)", "COLITA CUADRIL - CHORTI", "COLITA CUADRIL – QUINTA POTRERO", "COLITA CUADRIL – BRAFORD (VICTORIA)", "COLITA CUADRIL – ESTANCIA 92", "COLITA CUADRIL - CONCEPCIÓN", "COLITA CUADRIL - DON PEPE", "COLITA CUADRIL - FRIGOCHACO", "COLITA CUADRIL - NEULAND", "COSTILLA ESTANCIA 92 ANGUS", "COSTILLA ESPECIAL - NEULAND", "TAPA CUADRIL - CHORTI", "TAPA CUADRIL - CONCEPCIÓN", "VACÍO - CHORTI", "VACÍO - CONCEPCIÓN", "LOMITO - DON PEPE", "PECETO- CHORTI", "CUPIM - NEULAND"];
@@ -104,6 +95,37 @@
         document.getElementById('tab-big').className = (modo === 'big') ? 'tab active-big' : 'tab';
         document.getElementById('section-gen').className = (modo === 'gen') ? 'card' : 'card hidden';
         document.getElementById('section-big').className = (modo === 'big') ? 'card' : 'card hidden';
+    }
+
+    // VALIDACIÓN ACTUALIZADA: CARACTERES + LÓGICA OFERTA < REGULAR
+    function validarInput(input) {
+        const val = input.value;
+        const parent = input.closest('.precios-row');
+        const isOferta = input.classList.contains('p-ofe') || input.classList.contains('n-precio');
+        const errorSpan = input.parentElement.querySelector('.error-msg');
+        
+        // 1. Validar extensión (5 o 6 dígitos)
+        if (val.length > 0 && (val.length < 5 || val.length > 6)) {
+            errorSpan.innerText = "Debe tener 5 o 6 números";
+            input.classList.add('input-error');
+            return;
+        }
+
+        // 2. Validar que Oferta no sea mayor al Regular
+        if (parent && isOferta) {
+            const regInput = parent.querySelector('.p-reg') || {value: 0}; 
+            const valReg = parseFloat(regInput.value) || 0;
+            const valOff = parseFloat(val) || 0;
+
+            if (valOff > 0 && valReg > 0 && valOff > valReg) {
+                errorSpan.innerText = "Oferta no puede ser mayor";
+                input.classList.add('input-error');
+                return;
+            }
+        }
+
+        errorSpan.innerText = "";
+        input.classList.remove('input-error');
     }
 
     function inicializarApp() {
@@ -120,8 +142,16 @@
             div.className = 'item-carne';
             div.innerHTML = `<span>${c}</span>
                 <div class="precios-row">
-                    <div class="price-field"><small>P. REGULAR</small><input type="number" inputmode="decimal" class="p-reg" placeholder="0"></div>
-                    <div class="price-field"><small>P. OFERTA</small><input type="number" inputmode="decimal" class="p-ofe" placeholder="0"></div>
+                    <div class="price-field">
+                        <small>P. REGULAR</small>
+                        <input type="number" inputmode="decimal" class="p-reg" placeholder="0" oninput="validarInput(this)">
+                        <span class="error-msg"></span>
+                    </div>
+                    <div class="price-field">
+                        <small>P. OFERTA</small>
+                        <input type="number" inputmode="decimal" class="p-ofe" placeholder="0" oninput="validarInput(this)">
+                        <span class="error-msg"></span>
+                    </div>
                 </div>`;
             contCortes.appendChild(div);
         });
@@ -144,11 +174,16 @@
         div.className = 'nuevo-corte-item';
         div.id = `nuevo-${id}`;
         div.style = "background: #fff8e1; border: 2px dashed var(--secondary); padding: 15px; border-radius: 10px; margin-top: 10px; position: relative;";
-        div.innerHTML = `<i class="material-icons" style="position: absolute; top: 5px; right: 5px; color: #d32f2f; cursor: pointer;" onclick="this.parentElement.remove()">cancel</i>
+        div.innerHTML = `<i class="material-icons" style="position: absolute; top: 5px; right: 5px; color: #d32f2f; cursor: pointer;"
+            onclick="this.parentElement.remove()">cancel</i>
             <label>Nombre Producto Nuevo</label><input type="text" class="n-nombre" placeholder="Nombre...">
             <div class="precios-row">
                 <div class="price-field"><small>MARCA</small><input type="text" class="n-marca" placeholder="Marca..."></div>
-                <div class="price-field"><small>PRECIO</small><input type="number" inputmode="decimal" class="n-precio" placeholder="Gs."></div>
+                <div class="price-field">
+                    <small>PRECIO</small>
+                    <input type="number" inputmode="decimal" class="n-precio" placeholder="Gs." oninput="validarInput(this)">
+                    <span class="error-msg"></span>
+                </div>
             </div>`;
         document.getElementById('contenedor-nuevos').appendChild(div);
     }
@@ -160,87 +195,66 @@
         });
     }
 
- async function guardar() {
-    // --- URL DE IMPLEMENTACIÓN ---
-    const url = "https://script.google.com/macros/s/AKfycbwW_-E1Poz6TUcrE8UjMhjg0edRP3k7Bbh8MUKzr27Tn5ss3NOKES5UNJGE8xsiAtZKUQ/exec";
-    
-    const btn = document.getElementById('btn-envio');
-    let relevador, local;    
-    
-    if(modoActual === 'gen') {
-        relevador = document.getElementById('relevador_gen').value;
-        local = document.getElementById('local_gen').value;
-    } else {
-        relevador = document.getElementById('relevador_biggie').value;
-        local = document.getElementById('local_biggie').value;
-    }
-
-    const items = [];
-    
-    // Captura productos de lista
-    document.querySelectorAll('.item-carne').forEach(div => {
-        // CORRECCIÓN: Usamos p-reg y p-off que son las clases que suelen tener tus inputs
-        const regInput = div.querySelector('.p-reg'); 
-        const offInput = div.querySelector('.p-off');
+    async function guardar() {
+        const url = "https://script.google.com/macros/s/AKfycbwW_-E1Poz6TUcrE8UjMhjg0edRP3k7Bbh8MUKzr27Tn5ss3NOKES5UNJGE8xsiAtZKUQ/exec";
+        const btn = document.getElementById('btn-envio');
+        let relevador, local;    
         
-        const valorReg = regInput ? regInput.value : "";
-        const valorOff = offInput ? offInput.value : "";
-
-        if(valorReg || valorOff) {
-            items.push({ 
-                corte: div.querySelector('span').innerText, 
-                precioReg: valorReg || 0, 
-                precioOff: valorOff || 0, 
-                esNuevo: false 
-            });
+        if(modoActual === 'gen') {
+            relevador = document.getElementById('relevador_gen').value;
+            local = document.getElementById('local_gen').value;
+        } else {
+            relevador = document.getElementById('relevador_biggie').value;
+            local = document.getElementById('local_biggie').value;
         }
-    });
 
-    // Captura productos nuevos
-    document.querySelectorAll('.nuevo-corte-item').forEach(div => {
-        const nom = div.querySelector('.n-nombre').value;
-        const pre = div.querySelector('.n-precio').value;
-        const mar = div.querySelector('.n-marca').value;
-        if(nom && pre) {
-            items.push({ 
-                corte: nom, 
-                precioReg: pre, 
-                marca: mar, 
-                esNuevo: true 
-            });
-        }
-    });
+        const items = [];
+        let hayErrores = false;
 
-    // Validación antes de enviar
-    if(!relevador || !local || items.length === 0) {
-        return alert("Error: Debes completar Relevador, Local y al menos un precio.");
-    }
-
-    btn.disabled = true;
-    btn.innerHTML = "ENVIANDO...";
-
-    const categoriaFinal = (modoActual === 'big') ? 'BIGGIE' : 'GENERAL';
-
-    try {
-        await fetch(url, { 
-            method: 'POST', 
-            mode: 'no-cors', 
-            body: JSON.stringify({ 
-                fecha: new Date().toLocaleString(), 
-                relevador: relevador, 
-                local: local, 
-                categoria: categoriaFinal,
-                items: items 
-            }) 
+        document.querySelectorAll('.error-msg').forEach(span => {
+            if(span.innerText !== "") hayErrores = true;
         });
-        alert("¡Relevamiento enviado con éxito!");
-        location.reload();
-    } catch(e) { 
-        alert("Error de envío. Revisa tu conexión."); 
-        btn.disabled = false;
-        btn.innerHTML = "ENVIAR RELEVAMIENTO";
+
+        if(hayErrores) return alert("Corrige los errores en rojo antes de enviar.");
+
+        document.querySelectorAll('.item-carne').forEach(div => {
+            const nombre = div.querySelector('span').innerText;
+            const valorReg = div.querySelector('.p-reg').value;
+            const valorOff = div.querySelector('.p-ofe').value;
+            if(valorReg || valorOff) {
+                items.push({ corte: nombre, precioReg: valorReg || 0, precioOff: valorOff || 0, esNuevo: false });
+            }
+        });
+
+        document.querySelectorAll('.nuevo-corte-item').forEach(div => {
+            const nom = div.querySelector('.n-nombre').value;
+            const pre = div.querySelector('.n-precio').value;
+            const mar = div.querySelector('.n-marca').value;
+            if(nom && pre) items.push({ corte: nom, precioReg: pre, marca: mar, esNuevo: true });
+        });
+
+        if(!relevador || !local || items.length === 0) return alert("Completa Relevador, Local y carga algún precio.");
+
+        btn.disabled = true;
+        btn.innerHTML = "ENVIANDO...";
+
+        const categoriaFinal = (modoActual === 'big') ? 'BIGGIE' : 'GENERAL';
+        try {
+            await fetch(url, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                body: JSON.stringify({ 
+                    fecha: new Date().toLocaleString(), relevador: relevador, local: local, categoria: categoriaFinal, items: items 
+                }) 
+            });
+            alert("¡Relevamiento enviado con éxito!");
+            location.reload();
+        } catch(e) { 
+            alert("Error de envío. Revisa tu conexión.");
+            btn.disabled = false;
+            btn.innerHTML = "ENVIAR RELEVAMIENTO";
+        }
     }
-}
 
     window.addEventListener('load', inicializarApp);
 </script>

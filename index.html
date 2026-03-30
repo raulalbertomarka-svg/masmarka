@@ -19,6 +19,8 @@
         .tab.active-big { background: var(--biggie); color: white; }
         label { font-size: 11px; color: var(--primary); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 5px; }
         input, select { width: 100%; padding: 12px; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box; font-size: 16px; margin-bottom: 5px; background: white; transition: all 0.2s; }
+        .input-error { border: 2px solid #d32f2f !important; background-color: #fff8f8 !important; }
+        .error-msg { color: #d32f2f; font-size: 10px; font-weight: bold; margin-bottom: 10px; display: block; min-height: 12px; }
         .btn-add { background: var(--secondary); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; }
         .item-carne { border-bottom: 1px solid #eee; padding: 12px 0; }
         .item-carne span { font-weight: bold; display: block; margin-bottom: 8px; font-size: 14px; color: #333; }
@@ -28,20 +30,44 @@
         .btn-submit { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 15px; width: 100%; font-weight: bold; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .hidden { display: none; }
 
-        /* Custom dropdown styles */
+        /* ── Custom dropdown local_gen ── */
         .custom-select-wrapper { position: relative; width: 100%; margin-bottom: 5px; }
-        .custom-select-display { width: 100%; padding: 12px; border: 1px solid #ced4da; border-radius: 6px; background: white; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .custom-select-display {
+            width: 100%; padding: 12px 40px 12px 12px; border: 1px solid #ced4da;
+            border-radius: 6px; box-sizing: border-box; font-size: 16px;
+            background: white; cursor: pointer; user-select: none;
+            display: flex; align-items: center; justify-content: space-between;
+            transition: all 0.2s; color: #333;
+        }
         .custom-select-display.placeholder { color: #aaa; }
-        .custom-select-dropdown { display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ced4da; z-index: 2000; max-height: 250px; overflow: hidden; flex-direction: column; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .custom-select-dropdown.open { display: flex; }
-        .custom-select-search { padding: 10px; border: none; border-bottom: 1px solid #eee; width: 100%; box-sizing: border-box; outline: none; }
-        .custom-select-list { overflow-y: auto; flex: 1; }
-        .custom-select-option { padding: 12px; cursor: pointer; border-bottom: 1px solid #f5f5f5; }
-        .custom-select-option:hover { background: #f0f0f0; }
-
-        /* Botón eliminar corte nuevo */
-        .btn-eliminar-corte { position: absolute; top: 10px; right: 10px; background: var(--biggie); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 18px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .nuevo-corte-item { position: relative; padding-top: 35px; }
+        .custom-select-display .arrow {
+            font-size: 18px; color: #555; pointer-events: none; flex-shrink: 0;
+        }
+        .custom-select-dropdown {
+            display: none; position: absolute; top: 100%; left: 0; right: 0;
+            background: white; border: 1px solid #ced4da; border-top: none;
+            border-radius: 0 0 6px 6px; z-index: 2000;
+            max-height: 260px; overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .custom-select-dropdown.open { display: flex; flex-direction: column; }
+        .custom-select-search {
+            padding: 10px 12px; border: none; border-bottom: 1px solid #eee;
+            font-size: 15px; outline: none; width: 100%; box-sizing: border-box;
+            flex-shrink: 0;
+        }
+        .custom-select-list {
+            overflow-y: auto; flex: 1;
+        }
+        .custom-select-option {
+            padding: 12px 15px; cursor: pointer; font-size: 15px;
+            border-bottom: 1px solid #f5f5f5;
+            transition: background 0.1s;
+        }
+        .custom-select-option:hover { background: #e8f5e9; }
+        .custom-select-option.no-result { color: #999; font-style: italic; cursor: default; }
+        .custom-select-option.no-result:hover { background: transparent; }
+        /* reusar mismos estilos para relevador dropdown */
     </style>
 </head>
 <body>
@@ -56,33 +82,50 @@
 
     <div id="section-gen" class="card">
         <label>Relevador General</label>
+        <!-- Custom dropdown relevador: solo permite seleccionar de la lista, NO escritura libre -->
         <div class="custom-select-wrapper" id="relevador-gen-wrapper">
             <div class="custom-select-display placeholder" id="relevador-gen-display" onclick="toggleRelevadorDropdown()">
                 <span id="relevador-gen-text">Tu nombre...</span>
-                <span class="material-icons">arrow_drop_down</span>
+                <span class="material-icons arrow">arrow_drop_down</span>
             </div>
             <div class="custom-select-dropdown" id="relevador-gen-dropdown">
-                <input type="text" class="custom-select-search" id="relevador-gen-search" placeholder="Buscar..." oninput="filtrarRelevadoresDropdown()">
+                <input
+                    type="text"
+                    class="custom-select-search"
+                    id="relevador-gen-search"
+                    placeholder="Buscar relevador..."
+                    oninput="filtrarRelevadoresDropdown()"
+                    autocomplete="off"
+                >
                 <div class="custom-select-list" id="relevador-gen-list"></div>
             </div>
         </div>
         <input type="hidden" id="relevador_gen">
 
         <label>Local</label>
+        <!-- Custom dropdown: solo permite seleccionar de la lista, NO escritura libre -->
         <div class="custom-select-wrapper" id="local-gen-wrapper">
             <div class="custom-select-display placeholder" id="local-gen-display" onclick="toggleLocalDropdown()">
                 <span id="local-gen-text">Buscar local...</span>
-                <span class="material-icons">arrow_drop_down</span>
+                <span class="material-icons arrow">arrow_drop_down</span>
             </div>
             <div class="custom-select-dropdown" id="local-gen-dropdown">
-                <input type="text" class="custom-select-search" id="local-gen-search" placeholder="Filtrar..." oninput="filtrarLocalesDropdown()">
+                <input
+                    type="text"
+                    class="custom-select-search"
+                    id="local-gen-search"
+                    placeholder="Filtrar locales..."
+                    oninput="filtrarLocalesDropdown()"
+                    autocomplete="off"
+                >
                 <div class="custom-select-list" id="local-gen-list"></div>
             </div>
         </div>
+        <!-- Campo oculto que guarda el valor real seleccionado -->
         <input type="hidden" id="local_gen">
     </div>
 
-    <div id="section-big" class="card hidden">
+    <div id="section-big" class="card hidden" style="border: 2px solid var(--biggie);">
         <label style="color: var(--biggie);">Relevador Biggie</label>
         <select id="relevador_biggie" onchange="cargarLocalesBiggie(this.value)">
             <option value="">-- Selecciona --</option>
@@ -101,7 +144,7 @@
     </div>
 
     <div class="card">
-        <input type="text" id="buscador" placeholder="Filtrar productos..." onkeyup="filtrar()">
+        <input type="text" id="buscador" placeholder="Filtrar productos de lista..." onkeyup="filtrar()">
         <div id="lista-cortes"></div>
     </div>
 </main>
@@ -114,111 +157,289 @@
 
 <script>
     let modoActual = 'gen';
-
-    const datos_biggie = { 
-        "MAGNO MARTINEZ": ["FERNANDO 11 DE SEPTIEMBRE", "PANCHITO LOPEZ", "SAN LORENZO CAMPO JORDAN", "SAN LORENZO MANUEL ORTIZ GUERRERO", "CALLE I", "FERNANDO IPS INGAVI", "FERNANDO MARISCAL ESTIGARRIBIA", "SAN LORENZO AVELINO MARTINEZ", "SAN LORENZO DE LA VICTORIA", "SAN LORENZO CATEDRAL", "SAN LORENZO RUTA 1 Y 2", "SAN LORENZO PASTORA CESPEDES", "FERNANDO LEOPARDÍ", "INGAVI PLATANILLO", "CICLOVIA", "14 Y MEDIO", "UNA", "CNEL CAZAL", "VICTORIO CURIEL", "MARISCAL LOPEZ E INGAVI", "SAN PEDRO", "POSTA YBYCUA", "JA SALDIVAR TRES BOCAS", "THOMPSON", "GOICOCHEA", "CAMINERA", "YATAITY", "LUCERITO", "ISLA PO I"], 
-        "ALEJANDRO VAZQUEZ": ["PERON CERRO LAMBARE", "PERON Y FELIX BOGADO", "PIRIZAL", "LAMBARE 1RO DE MARZO", "LAMBARE AVENIDA DEL YACHT", "LAMBARE BRUNO GUGGIARI", "PIZARRO", "INDEPENDENCIA NACIONAL Y QUINTA", "QUINTA Y PARAPITI", "ARANJUEZ", "POZO FAVORITO", "PUERTO PABLA", "SAN VICENTE IGLESIA", "LAMBARE BRUNO GUGGIARI SAN RAFAEL", "LAMBARE CARRETERA DE LOPEZ", "BRUNO GUGGIARI PINOZA", "LAMBARE CENTURY PLAZA", "LAMBARE SAN ISIDRO", "MEDICOS DEL CHACO C/NUÑEZ DE BALBOA", "LAMBARE ARGAA", "BARRIO OBRERO HOSPITAL", "BIGGIE EEU OBRERO", "LAMBARE ROA BASTOS", "BIGGIE MUNICIPAL"], 
-        "FERNANDO PENAYO": ["ANTONIO SAN FRANCISCO", "CENTURY", "VICTOR CURIEL", "MANUEL ORTIZ GUERRERO", "LUCERITO", "CAMPO JORDAN", "PUERTO PABLA", "PASO PATRIA", "AMERICO PICO", "VILLA ELISA VON POLESKI", "VILLA ELISA VON POLESKI Y DR. FRANCIA", "BIGGIE CAAGUAZU", "4 MOJON", "VILLA ELISA CICLOVIA PICADA", "SAN NTONIO CENTRO", "RINCON", "CAPILLA DEL MONTE", "MOISES BERTONI", "BIGGIE VILLA ELISA PETROPAR", "SAN CARLOS", "SAN ANTONIO YTORORO", "ÑEMBY CENTRO", "CAÑADITA", "VALLE APUA", "BIGGIE YPANE", "JACARE VALIJA", "ACCESO SUR", "BIGGIE DEFENSORES", "BIGGGIE TORIBIO"], 
-        "MATIAS RODRIGUEZ": ["MATERNO FERNANDO", "UNA", "MCAL LOPEZ E INGAVI", "CNEL. CAZAL", "INGAVI IPS", "BOGGIANI", "PLATANILLO", "PASTORA CESPEDES", "LEOPARDI", "MCAL ESTIGARRIBIA", "11 DE SEPTIEMBRE", "ISLA PO´I", "AVELINO MARTINEZ", "MCAL. LOPEZ MUNICIPALIDAD", "SAN PABLO", "HIPODROMO", "CABALLERIA", "CASA MODIGA", "LILIO HERRERA", "ZAVALAS CUE NORTE", "ZAVALAS CUE SUR", "SOLDADO OVELAR Y PROGRESO", "SOLDADO OVELAR Y PANCHITO", "LILIO BRIZUELA", "LUIS ALBERTO DEL PARANA", "GRAL. A. GARAY", "PELLON", "BRUMADO", "SANTA MARIA", "LAGUNA GRANDE", "LA VICTORIA Y CARIOS", "DENIS ROA", "GUYRA CAMPANA", "MARISCAL LOPEZ FERNANDO", "WALDINO LOVERA", "ABASTO", "ISLA PO'I"], 
-        "FABRICIO SAMANIEGO": ["BARTOLOME DE LAS CASAS", "CALLE´I", "CALLE'I", "GOICOCHEA", "14 Y MEDIO", "PASEO LA CATEDRAL", "RUTA 2 NGO", "RUTA 1 NGO", "CICLOVIA", "CORONEL MARTINEZ", "VALLE PUCU", "CHOFERES Y JULIANA INSFRAN", "BIGGIE AREGUA CAACUPEMI", "FERNANDO MADAME LYNCH", "LUQUE PRIMAVERA", "PEDRO PENA", "R.I. 18 PITIANTUTA", "BIGGIE GHA", "CAMPO VIA", "SEIFERHELD", "ISLA BOGADO", "RIO VERDE", "BIGGIE TRINITY", "BIGGIE MUNICIPALIDAD LUQUE", "BARTOLOME Y FERNANDO DE LA MORA PERO PIDIERON", "LUQUE AREGUA", "MEDICOS DEL CHACO", "MARAMBURE", "ORTIZ GUERRERO ", "TERMINAL", "CUARTO BARRIO"], 
-        "ELIAS ESCOBAR": ["SAN BERNARDINO AQUA", "ALTOS", "SAN BERNARDINO CIERVO CUA", "SAN BERNARDINO HIGHLANS", "SAN BERNARDINO CASINO", "SAN BERNARDINO COYOTE- 2 ", "SAN BERNARDINO LAGO AZUL", "SAN BERNARDINO KENNEDY ", "YPACARAI PEAJE", "CAACUPÉ CURVA", "CAACUPE CENTRO", "SANTA CATALINA", "ROJAS CAÑADA", "SAN MIGUEL", "YPACARAI RUTA 2", "DR LOPEZ", "ITA CENTRO", "ITAUGUA CENTRO", "ITAUGUA SAN ROQUE", "ITAUGUA GENARO RODRIGUEZ", "ITA SAN BLAS", "CAPIATA LAURETY", "ESTUDIANTE CAPIATEÑO", "3 BOCAS", "CAMINERA", "YATAITY", "POSTA YBYCUA", "THOMSON", "SAN PEDRO", "DE LA VICTORIA"], 
-        "BLAS PAREDES": ["CENTENARIO ESPAÑA", "LEGION CIVIL EXTRANJERA", "RCA. ARGENTINA", "HEROES DEL CHACO", "GAUDIOSO NUÑEZ", "HERRERA Y GRAL SANTOS ", "ESPAÑA SAN Jose", "COLON Y HAEDO", "RODRIGUEZ DE FRANCIA ", "YGATYMI Y MONTEVIDEO", "CAL - DEFENSORES DEL CHACO", "PALMA", "ESTRELLA ", "SAJONIA LA ENCARNACION", "CARLOS ANTONIO LOPEZ-", "ANA DIAZ", "CHILE Y PIRIBEBUY", "PACHECO", "DE LAS PALMERAS", "KUBITSCHEK SEMINARIO", "LILIO VILLA MORRA", "LOS LAURELES", "TEODORO S. MONGELOS", "AZARA Y EEUU"], 
-        "CRISTINO SAMANIEGO": ["GENERAL GARAY ", "LUQUE ALFARO", "LUQUE AMERICA", "LUQUE CENTRO", "4 VIENTOS", "SANTO DOMINGO", "LOS PINOS", "YCUA KARANDAY", "ROJAS SILVA", "FERNANDO 3 FRONTERAS", "LUQUE DE LA RESIDENTA", "LUQUE ELIZARDO AQUINO", "LUQUE ESTADIO ", "LUQUE GARDEN ", "MARENA", "SAN LORENZO MONTOYA ", "LUQUE MORA CUE", "LUQUE ROSARIO", "LUQUE NANAWA", "TUPA REKAVO", "BRITEZ BORGES", "LUQUE SANBER- ARIELITO", "PALMA LOMA", "VILLA POLICIAL", "AEROPUERTO", "LUQUE SEGUNDA CAPITAL"], 
-        "DAYSI GAONA": ["AVIADORES", "SCAVONNE", "PRIMER PRESIDENTE LYNCH", "TRINIDAD JADE", "MOLAS LOPEZ Y TEBICUARY","ITAPUA", "LAS MERCEDES- WASHINGTON", "MOLAS LOPEZ LOMAS", "ARTIGAS COMFAR", "NUESTRA SRA. DEL CARMEN", "SAN MARTIN LOMAS", "MARISCAL LOPEZ Y PERU", "DOMINICANA", "MBURUKUYA", "SANTA TERESA", "SAN MARTIN Y BRUSELAS", "TRINIDAD CAMPO GRANDE", "PRIMER PRESIDENTE", "VIA FERREA", "ARTIGAS LA COSTA", "FEDERACION RUSA", "RCA DE SIRIA", "BRASILIA AMERICANA"], 
-        "ALICIA OJEDA": ["BERNARDINO CABALLERO MRA", "ARECAYA MRA", "TRANSCHACO MRA", "NANAWA MRA", "CIMEFOR MRA", "PUENTE REMANSO MRA", "SAN JORGE MRA", "EXPO MRA", "LIMPIO PUMA", "LIMPIO COLECTORA", "LIMPIO CENTRO", "LIMPIO SAN ROQUE", "SARGENTO GAUTO", "SACRAMENTO Y ROQUE CENTURION MIRANDA", "VENEZUELA", "GENARO ROMERO", "SACRAMENTO E ITAPUA", "ZEBALLOS CUE", "TRANSCHACO LOMA PYTA", "TRANSCHACO SEMIDEI", "LOMBARDO LOMA PYTA"],
-        "ROBERTO CLIVIO": ["FERNANDO 11 DE SEPTIEMBRE", "SAN LORENZO CAMPO JORDAN", "SAN LORENZO MANUEL ORTIZ GUERRERO"]
-    };
-
+    const datos_biggie = { "MAGNO MARTINEZ": ["FERNANDO 11 DE SEPTIEMBRE", "PANCHITO LOPEZ", "SAN LORENZO CAMPO JORDAN", "SAN LORENZO MANUEL ORTIZ GUERRERO", "CALLE I", "FERNANDO IPS INGAVI", "FERNANDO MARISCAL ESTIGARRIBIA", "SAN LORENZO AVELINO MARTINEZ", "SAN LORENZO DE LA VICTORIA", "SAN LORENZO CATEDRAL", "SAN LORENZO RUTA 1 Y 2", "SAN LORENZO PASTORA CESPEDES", "FERNANDO LEOPARDÍ", "INGAVI PLATANILLO", "CICLOVIA", "14 Y MEDIO", "UNA", "CNEL CAZAL", "VICTORIO CURIEL", "MARISCAL LOPEZ E INGAVI", "SAN PEDRO", "POSTA YBYCUA", "JA SALDIVAR TRES BOCAS", "THOMPSON", "GOICOCHEA", "CAMINERA", "YATAITY", "LUCERITO", "ISLA PO I"], "ALEJANDRO VAZQUEZ": ["PERON CERRO LAMBARE", "PERON Y FELIX BOGADO", "PIRIZAL", "LAMBARE 1RO DE MARZO", "LAMBARE AVENIDA DEL YACHT", "LAMBARE BRUNO GUGGIARI", "PIZARRO", "INDEPENDENCIA NACIONAL Y QUINTA", "QUINTA Y PARAPITI", "ARANJUEZ", "POZO FAVORITO", "PUERTO PABLA", "SAN VICENTE IGLESIA", "LAMBARE BRUNO GUGGIARI SAN RAFAEL", "LAMBARE CARRETERA DE LOPEZ", "BRUNO GUGGIARI PINOZA", "LAMBARE CENTURY PLAZA", "LAMBARE SAN ISIDRO", "MEDICOS DEL CHACO C/NUÑEZ DE BALBOA", "LAMBARE ARGAA", "BARRIO OBRERO HOSPITAL", "BIGGIE EEU OBRERO", "LAMBARE ROA BASTOS", "BIGGIE MUNICIPAL"], "FERNANDO PENAYO": ["ANTONIO SAN FRANCISCO", "CENTURY", "PUERTO PABLA", "PASO PATRIA", "AMERICO PICO", "VILLA ELISA VON POLESKI", "VILLA ELISA VON POLESKI Y DR. FRANCIA", "BIGGIE CAAGUAZU", "4 MOJON", "VILLA ELISA CICLOVIA PICADA", "SAN NTONIO CENTRO", "RINCON", "CAPILLA DEL MONTE", "MOISES BERTONI", "BIGGIE VILLA ELISA PETROPAR", "SAN CARLOS", "SAN ANTONIO YTORORO", "ÑEMBY CENTRO", "CAÑADITA", "VALLE APUA", "BIGGIE YPANE", "JACARE VALIJA", "ACCESO SUR", "BIGGIE DEFENSORES", "BIGGGIE TORIBIO"], "MATIAS RODRIGUEZ": ["MATERNO FERNANDO", "BOGGIANI", "MCAL. LOPEZ MUNICIPALIDAD", "SAN PABLO", "HIPODROMO", "CABALLERIA", "CASA MODIGA", "LILIO HERRERA", "ZAVALAS CUE NORTE", "ZAVALAS CUE SUR", "SOLDADO OVELAR Y PROGRESO", "SOLDADO OVELAR Y PANCHITO", "LILIO BRIZUELA", "LUIS ALBERTO DEL PARANA", "SOLDADO OVELAR Y PROGRESO", "GRAL. A. GARAY", "PELLON", "BRUMADO", "SANTA MARIA", "LAGUNA GRANDE", "LA VICTORIA Y CARIOS", "DENIS ROA", "GUYRA CAMPANA", "MARISCAL LOPEZ FERNANDO", "WALDINO LOVERA", "ABASTO"], "FABRICIO SAMANIEGO": ["BARTOLOME DE LAS CASAS", "CORONEL MARTINEZ", "VALLE PUCU", "CHOFERES Y JULIANA INSFRAN", "BIGGIE AREGUA CAACUPEMI", "FERNANDO MADAME LYNCH", "LUQUE PRIMAVERA", "PEDRO PENA", "R.I. 18 PITIANTUTA", "BIGGIE GHA", "CAMPO VIA", "SEIFERHELD", "ISLA BOGADO", "RIO VERDE", "BIGGIE TRINITY", "BIGGIE MUNICIPALIDAD LUQUE", "BARTOLOME Y FERNANDO DE LA MORA PERO PIDIERON", "LUQUE AREGUA", "MEDICOS DEL CHACO", "MARAMBURE", "ORTIZ GUERRERO ", "TERMINAL", "CUARTO BARRIO"], "ELIAS ESCOBAR": ["SAN BERNARDINO AQUA", "ALTOS", "SAN BERNARDINO CIERVO CUA", "SAN BERNARDINO HIGHLANS", "SAN BERNARDINO CASINO", "SAN BERNARDINO COYOTE- 2 ", "SAN BERNARDINO LAGO AZUL", "SAN BERNARDINO KENNEDY ", "YPACARAI PEAJE", "CAACUPÉ CURVA", "CAACUPE CENTRO", "SANTA CATALINA", "ROJAS CAÑADA", "SAN MIGUEL", "YPACARAI RUTA 2", "DR LOPEZ", "ITA CENTRO", "ITAUGUA CENTRO", "ITAUGUA SAN ROQUE", "ITAUGUA GENARO RODRIGUEZ", "ITA SAN BLAS", "CAPIATA LAURETY", "ESTUDIANTE CAPIATEÑO"], "BLAS PAREDES": ["CENTENARIO ESPAÑA", "LEGION CIVIL EXTRANJERA", "RCA. ARGENTINA", "HEROES DEL CHACO", "GAUDIOSO NUÑEZ", "HERRERA Y GRAL SANTOS ", "ESPAÑA SAN JOSE", "COLON Y HAEDO", "RODRIGUEZ DE FRANCIA ", "YGATYMI Y MONTEVIDEO", "CAL - DEFENSORES DEL CHACO", "PALMA", "ESTRELLA ", "SAJONIA LA ENCARNACION", "CARLOS ANTONIO LOPEZ-", "ANA DIAZ", "CHILE Y PIRIBEBUY", "PACHECO", "DE LAS PALMERAS", "KUBITSCHEK SEMINARIO", "LILIO VILLA MORRA", "LOS LAURELES", "TEODORO S. MONGELOS", "AZARA Y EEUU"], "CRISTINO SAMANIEGO": ["GENERAL GARAY ", "LUQUE ALFARO", "LUQUE AMERICA", "LUQUE CENTRO", "4 VIENTOS", "SANTO DOMINGO", "LOS PINOS", "YCUA KARANDAY", "ROJAS SILVA", "FERNANDO 3 FRONTERAS", "LUQUE DE LA RESIDENTA", "LUQUE ELIZARDO AQUINO", "LUQUE ESTADIO ", "LUQUE GARDEN ", "MARENA", "SAN LORENZO MONTOYA ", "LUQUE MORA CUE", "LUQUE ROSARIO", "LUQUE NANAWA", "TUPA REKAVO", "BRITEZ BORGES", "LUQUE SANBER- ARIELITO", "PALMA LOMA", "VILLA POLICIAL", "AEROPUERTO", "LUQUE SEGUNDA CAPITAL"], "DAYSI GAONA": ["AVIADORES", "SCAVONNE", "PRIMER PRESIDENTE LYNCH", "TRINIDAD JADE", "MOLAS LOPEZ Y TEBICUARY","ITAPUA", "LAS MERCEDES- WASHINGTON", "MOLAS LOPEZ LOMAS", "ARTIGAS COMFAR", "NUESTRA SRA. DEL CARMEN", "SAN MARTIN LOMAS", "MARISCAL LOPEZ Y PERU", "DOMINICANA", "MBURUKUYA", "SANTA TERESA", "SAN MARTIN Y BRUSELAS", "TRINIDAD CAMPO GRANDE", "PRIMER PRESIDENTE", "VIA FERREA", "ARTIGAS LA COSTA", "FEDERACION RUSA", "RCA DE SIRIA", "BRASILIA AMERICANA"], "ALICIA OJEDA": ["BERNARDINO CABALLERO MRA", "ARECAYA MRA", "TRANSCHACO MRA", "NANAWA MRA", "CIMEFOR MRA", "PUENTE REMANSO MRA", "SAN JORGE MRA", "EXPO MRA", "LIMPIO PUMA", "LIMPIO COLECTORA", "LIMPIO CENTRO", "LIMPIO SAN ROQUE", "SARGENTO GAUTO", "SACRAMENTO Y ROQUE CENTURION MIRANDA", "VENEZUELA", "GENARO ROMERO", "SACRAMENTO E ITAPUA", "ZEBALLOS CUE", "TRANSCHACO LOMA PYTA", "TRANSCHACO SEMIDEI", "LOMBARDO LOMA PYTA"], "ROBERTO CLIVIO": ["FERNANDO 11 DE SEPTIEMBRE", "SAN LORENZO CAMPO JORDAN", "SAN LORENZO MANUEL ORTIZ GUERRERO", "CALLE I", "FERNANDO IPS INGAVI", "FERNANDO MARISCAL ESTIGARRIBIA", "SAN LORENZO AVELINO MARTINEZ", "SAN LORENZO DE LA VICTORIA", "SAN LORENZO CATEDRAL", "SAN LORENZO RUTA 1 Y 2", "SAN LORENZO PASTORA CESPEDES", "FERNANDO LEOPARDÍ", "INGAVI PLATANILLO", "CICLOVIA", "14 Y MEDIO", "UNA", "CNEL CAZAL", "VICTORIO CURIEL", "MARISCAL LOPEZ E INGAVI", "SAN PEDRO", "POSTA YBYCUA", "JA SALDIVAR TRES BOCAS", "THOMPSON", "GOICOCHEA", "CAMINERA", "YATAITY", "LUCERITO", "ISLA PO I", "PERON CERRO LAMBARE", "PERON Y FELIX BOGADO", "PIRIZAL", "LAMBARE 1RO DE MARZO", "LAMBARE AVENIDA DEL YACHT", "LAMBARE BRUNO GUGGIARI", "PIZARRO", "INDEPENDENCIA NACIONAL Y QUINTA", "QUINTA Y PARAPITI", "ARANJUEZ", "POZO FAVORITO", "PUERTO PABLA", "SAN VICENTE IGLESIA", "LAMBARE BRUNO GUGGIARI SAN RAFAEL", "LAMBARE CARRETERA DE LOPEZ", "BRUNO GUGGIARI PINOZA", "LAMBARE CENTURY PLAZA", "LAMBARE SAN ISIDRO", "MEDICOS DEL CHACO C/NUÑEZ DE BALBOA", "LAMBARE ARGAÑA", "BARRIO OBRERO HOSPITAL", "BIGGIE EEU OBRERO", "LAMBARE ROA BASTOS", "BIGGIE MUNICIPAL", "ANTONIO SAN FRANCISCO", "CENTURY", "PUERTO PABLA", "PASO PATRIA", "AMERICO PICO", "VILLA ELISA VON POLESKI", "VILLA ELISA VON POLESKI Y DR. FRANCIA", "BIGGIE CAAGUAZU", "4 MOJON", "VILLA ELISA CICLOVIA PICADA", "SAN NTONIO CENTRO", "RINCON", "CAPILLA DEL MONTE", "MOISES BERTONI", "BIGGIE VILLA ELISA PETROPAR", "SAN CARLOS", "SAN ANTONIO YTORORO", "ÑEMBY CENTRO", "CAÑADITA", "VALLE APUA", "BIGGIE YPANE", "JACARE VALIJA", "ACCESO SUR", "BIGGIE DEFENSORES", "BIGGGIE TORIBIO", "MATERNO FERNANDO", "SAN PABLO", "HIPODROMO", "CABALLERIA", "CASA MODIGA", "LILIO HERRERA", "ZAVALAS CUE NORTE", "ZAVALAS CUE SUR", "SOLDADO OVELAR Y PROGRESO", "SOLDADO OVELAR Y PANCHITO", "LILIO BRIZUELA", "LUIS ALBERTO DEL PARANA", "SOLDADO OVELAR Y PROGRESO", "GRAL. A. GARAY", "PELLON", "BRUMADO", "SANTA MARIA", "LAGUNA GRANDE", "LA VICTORIA Y CARIOS", "DENIS ROA", "GUYRA CAMPANA", "MARISCAL LOPEZ FERNANDO", "WALDINO LOVERA", "ABASTO", "BARTOLOME DE LAS CASAS", "CORONEL MARTINEZ", "VALLE PUCU", "CHOFERES Y JULIANA INSFRAN", "BIGGIE AREGUA CAACUPEMI", "FERNANDO MADAME LYNCH", "LUQUE PRIMAVERA", "PEDRO PENA", "R.I. 18 PITIANTUTA", "BIGGIE GHA", "CAMPO VIA", "SEIFERHELD", "ISLA BOGADO", "RIO VERDE", "BIGGIE TRINITY", "BIGGIE MUNICIPALIDAD LUQUE", "BARTOLOME Y FERNANDO DE LA MORA PERO PIDIERON", "LUQUE AREGUA", "MEDICOS DEL CHACO", "MARAMBURE", "ORTIZ GUERRERO ", "TERMINAL", "CUARTO BARRIO", "SAN BERNARDINO AQUA", "ALTOS", "SAN BERNARDINO CIERVO CUA", "SAN BERNARDINO HIGHLANS", "SAN BERNARDINO CASINO", "SAN BERNARDINO COYOTE- 2 ", "SAN BERNARDINO LAGO AZUL", "SAN BERNARDINO KENNEDY ", "YPACARAI PEAJE", "CAACUPÉ CURVA", "CAACUPE CENTRO", "SANTA CATALINA", "ROJAS CAÑADA", "SAN MIGUEL", "YPACARAI RUTA 2", "DR LOPEZ", "ITA CENTRO", "ITAUGUA CENTRO", "ITAUGUA SAN ROQUE", "ITAUGUA GENARO RODRIGUEZ", "ITA SAN BLAS", "CAPIATA LAURETY", "ESTUDIANTE CAPIATEÑO", "CENTENARIO ESPAÑA", "LEGION CIVIL EXTRANJERA", "RCA. ARGENTINA", "HEROES DEL CHACO", "GAUDIOSO NUÑEZ", "HERRERA Y GRAL SANTOS ", "ESPAÑA SAN JOSE", "COLON Y HAEDO", "RODRIGUEZ DE FRANCIA ", "YGATYMI Y MONTEVIDEO", "CAL - DEFENSORES DEL CHACO", "PALMA", "ESTRELLA ", "SAJONIA LA ENCARNACION", "CARLOS ANTONIO LOPEZ-", "ANA DIAZ", "CHILE Y PIRIBEBUY", "PACHECO", "DE LAS PALMERAS", "KUBITSCHEK SEMINARIO", "LILIO VILLA MORRA", "LOS LAURELES", "TEODORO S. MONGELOS", "AZARA Y EEUU", "GENERAL GARAY ", "LUQUE ALFARO", "LUQUE AMERICA", "LUQUE CENTRO", "4 VIENTOS", "SANTO DOMINGO", "LOS PINOS", "YCUA KARANDAY", "ROJAS SILVA", "FERNANDO 3 FRONTERAS", "LUQUE DE LA RESIDENTA", "LUQUE ELIZARDO AQUINO", "LUQUE ESTADIO ", "LUQUE GARDEN ", "MARENA", "SAN LORENZO MONTOYA ", "LUQUE MORA CUE", "LUQUE ROSARIO", "LUQUE NANAWA", "TUPA REKAVO", "BRITEZ BORGES", "LUQUE SANBER- ARIELITO", "PALMA LOMA", "VILLA POLICIAL", "AEROPUERTO", "LUQUE SEGUNDA CAPITAL", "DAYSI GAONA", "AVIADORES", "PRIMER PRESIDENTE LYNCH", "MOLAS LOPEZ Y TEBICUARY","ITAPUA", "LAS MERCEDES- WASHINGTON", "MOLAS LOPEZ LOMAS", "ARTIGAS COMFAR", "NUESTRA SRA. DEL CARMEN", "SAN MARTIN LOMAS", "MARISCAL LOPEZ Y PERU", "DOMINICANA", "MBURUKUYA", "SANTA TERESA", "SAN MARTIN Y BRUSELAS", "TRINIDAD CAMPO GRANDE", "PRIMER PRESIDENTE", "VIA FERREA", "ARTIGAS LA COSTA", "FEDERACION RUSA", "RCA DE SIRIA", "BRASILIA AMERICANA", "BERNARDINO CABALLERO MRA", "ARECAYA MRA", "TRANSCHACO MRA", "NANAWA MRA", "CIMEFOR MRA", "PUENTE REMANSO MRA", "SAN JORGE MRA", "EXPO MRA", "LIMPIO PUMA", "LIMPIO COLECTORA", "LIMPIO CENTRO", "LIMPIO SAN ROQUE", "SARGENTO GAUTO", "SACRAMENTO Y ROQUE CENTURION MIRANDA", "VENEZUELA", "GENARO ROMERO", "SACRAMENTO E ITAPUA", "ZEBALLOS CUE", "TRANSCHACO LOMA PYTA", "TRANSCHACO SEMIDEI", "LOMBARDO LOMA PYTA"] };
     const relevadores_gen = ["BLAS LEIVA", "JUAN ZORONDO", "CARMEN LEIVA", "PEDRO YUDICE", "HECTOR ACEVEDO", "JOSE NUÑEZ", "PERLA AQUINO", "ERIKA ESPINOLA", "FLORENCIA CACERES", "MATIAS NUÑEZ", "GABRIELA CACERES", "LETICIA BARRIOS", "KORBIN MERELES", "VIDAL OZORIO", "JULIO NUÑEZ", "DERLIS BRITEZ", "JOSUE CABALLERO", "DIANA", "ROBERTO CLIVIO"];
-    const locales_gen = ["SUPERSEIS - HIPERSEIS", "SUPERSEIS - MBURUCUYA", "CASA RICA - MOLAS", "CASA RICA - LAURELES", "STOCK - ACCESO SUR", "SALEMMA - MULTIPLAZA", "LUISITO - ÑEMBY", "SUPERSEIS - FERNANDO", "LOS JARDINES - JACARANDA", "BOX - MOG", "ARETE - PRIMER PRESIDENTE", "BIGGIE - VILLA HAYES"];
+    const locales_gen = ["SUPERSEIS - HIPERSEIS", "SUPERSEIS - MBURUCUYA", "CASA RICA - MOLAS", "CASA RICA - LAURELES", "SUPERSEIS - DELIMARKET", "SUPERSEIS - VILLA MORRA", "STOCK - ACCESO SUR", "STOCK - EXPRESS AMERICO PICCO", "SUPERSEIS - CAACUPE", "STOCK - EXPRESS PITIANTUTA", "STOCK - CAACUPE 1", "SALEMMA - MULTIPLAZA", "STOCK - EXPRESS MOMPOX", "STOCK - CAACUPE 2", "SUPERSEIS - ÑEMBY", "STOCK - EXPRESS PAI ÑU", "LUISITO - ÑEMBY", "STOCK - EXPRESS SOLDADO OVELAR", "STOCK - MANUEL ORTIZ GUERRERO", "SUPERSEIS - FERNANDO", "LOS JARDINES - JACARANDA", "BOX - MOG", "SALEMMA - SAN LORENZO", "LUISITO - SAN LORENZO", "STOCK - EXPRESS ACOSTA ÑU", "STOCK - MARTIN LEDESMA", "STOCK - EXPRESS 10 DE JULIO", "STOCK - AVELINO", "STOCK - AGRONOMO", "SUPERSEIS - SAN LORENZO", "STOCK - EXPRESS PRATT GILL", "SALEMMA - FUENTE", "LOS JARDINES - SAN LORENZO LEOPARDI", "STOCK - FERNANDO ZONA SUR", "STOCK - EXPRESS PINEDO", "STOCK - MARIANO 2", "LUISITO - MARIANO", "ARETE - PRIMER PRESIDENTE", "STOCK - ARTIGAS", "BOX - MARIANO", "STOCK - MARIANO 1", "STOCK - VILLA HAYES", "BIGGIE - VILLA HAYES", "ARETE - LAMBARE", "SUPERSEIS - LOS LAURELES", "LA BOMBA - PROCERES", "LUISITO - EUSEBIO AYALA", "STOCK - UNICOMPRA", "BOX - ABASTO", "STOCK - CAPIATA 2", "STOCK - EXPRESS 10 DE AGOSTO", "STOCK - EXPRESS DE LA VICTORIA", "BOX - ARATIRI R2", "STOCK - LA VICTORIA", "LUISITO - YPANE", "STOCK - YPANE", "STOCK - CAPIATA 1", "STOCK - 14 Y MEDIO", "STOCK - EXPRESS TTE MOLAS", "STOCK - PANCHITO LOPEZ", "SUPERSEIS - SIRIO", "STOCK - CARRETERA", "STOCK - DEFENSORES", "SUPERSEIS - LAMBARE", "LUISITO - FELIX BOGADO", "SUPERSEIS - JAPON", "STOCK - EXPRESS CAMPO VIA", "STOCK - EXPRESS FIGUEROA", "STOCK - EXPRESS PATRICIO ESCOBAR", "STOCK - EXPRESS MOLAS LOPEZ", "LUISITO - LUQUE", "SUPERSEIS - GRAN UNION", "STOCK - EXPRESS GENERAL SANTOS 2", "SUPERSEIS - DENIS ROA", "SUPERSEIS - GALERIA", "STOCK - EXPRESS SACRAMENTO", "LOS JARDINES - PRIMAVERA", "LOS JARDINES - GRAL AQUINO", "STOCK - VILLA ELISA", "STOCK - BOQUERON", "STOCK - EXPRESS CAMPO JORDAN", "LUISITO - VILLA ELISA", "LA BOMBA - ÑEMBY", "SUPERMAS - ÑEMBY", "STOCK - EXPRESS AVDA PARAGUAY", "STOCK - SAN ANTONIO", "SUPERSEIS - VILLETA", "SUPERSEIS - LAURELTY", "STOCK - PERONI", "SUPERSEIS - SANBER", "SUPERSEIS - SANBER EXPRESS", "STOCK - EXPRESS LAS RESIDENTAS", "STOCK - PALMA LOMA", "SUPERSEIS - LUQUE ROSARIO", "SUPERSEIS - PORTAL", "SUPERSEIS - EXPRESS PRIMER PRESIDENTE", "STOCK - SACRAMENTO", "STOCK - EXPRESS PRIMER PRESIDENTE", "SUPERSEIS - MUNDIMARK", "SUPERSEIS - EXPRESS RI BOQUERON", "SUPERSEIS - EXPRESS MOLAS", "LA BOMBA - SANTA TERESA", "SUPERSEIS - LA NEGRITA", "LA BOMBA - TERMINAL", "STOCK - EXPRESS GUATAMBU", "SUPERSEIS - TOTAL", "STOCK - BARRIO OBRERO", "STOCK - DOÑA BERTA", "STOCK - TERMINAL", "SUPERMAS - ABASTO", "SUPERSEIS - MADERO", "STOCK - PIQUETE CUE", "AHO - AHO", "STOCK - LIMPIO", "LUISITO - LIMPIO", "LA BOMBA - AREGUA", "SUPERSEIS - AREGUA", "BOX - CAPIATA R1", "STOCK - ITA", "STOCK - GUARAMBARE", "STOCK - J. AUGUSTO 2", "STOCK - J. AUGUSTO 1", "LUISITO - CAPIATA", "STOCK - ITAUGUA 1", "STOCK - PARAGUARI", "STOCK - ITAUGUA 2", "LUISITO - ITAUGUA", "CASA RICA - ESPAÑA", "ARETE - PINEDO", "SUPERSEIS - CAMBA CUA", "STOCK - BRITEZ BORGES", "STOCK - MARISCAL LOPEZ", "LUISITO - 4 MOJONES", "CASA RICA - PERSEVERANCIA", "SALEMMA - CARMELITAS", "STOCK - BRASILIA 1", "STOCK - BRASILIA 2", "STOCK - LAS MERCEDES", "SUPERSEIS - ESPAÑA", "SUPERMERCADO - GUARANI", "LA BOMBA - VIA FERREA", "LOS JARDINES - LAGUNA GRANDE", "LOS JARDINES - MORA CUE", "ARETE - SAUSALITO", "SUPERSEIS - MOIETY", "STOCK - CALLE I", "LOS JARDINES - VILLA ADELA"];
     
-    const cortes = ["BIFE DE CHORIZO - CHORTI", "TAPA NEULAND - ESPECIAL", "VACIO ESPECIAL - NEULAND", "TAPA EPP - NEULAND", "COLITA EPP - NEULAND", "COSTILLA EPP - NEULAND", "VACIO EPP - NEULAND", "TAPA CUADRIL - GUARANI", "COLITA CUADRIL - GUARANI", "BIFE ANCHO - GUARANI", "PUNTA DE PECHO - NEULAND", "BRISCKET - NEULAND", "PICADA PARRILLERA - PUL SELECCIÓN", "PICADA PARRILLERA - NEULAND", "VACIO GRILL - VICTORIA", "COLITA GILL - VICTORIA", "PECETO - PUL REGULAR", "TAPA CUADRIL - DEL CAMPO", "COLITA - DEL CAMPO", "VACIO - DEL CAMPO", "ENTRECOSTILLA - DEL CAMPO", "ENTRAÑA FINA - DEL CAMPO", "BIFE DE VACIO - NEULAND", "RECORTES DE LOMITO - VICTORIA", "RECORTES DE LOMITO - PUL SELECCIÓN", "COSTILLA FINA - VICTORIA", "BIFE ANCHO - DEL CAMPO", "LOMITO - DEL CAMPO", "BIFE ANCHO - CHORTI", "LOMITO - CAMPO 9", "LOMITO - QUINTO POTRERO", "TIRA FINA - QUINTA POTRERO", "OJO DE BIFE - QUINTA POTRERO", "COSTILLA SIN HUESO - PAMPA GOLD", "COSTILLA SIN HUESO - DON PEPE", "BIFE DE CHORIZO – PAMPA GOLD", "BIFE DE CHORIZO – FERHEIM", "BIFE DE CHORIZO - CONCEPCIÓN", "BIFE DE CHORIZO – QUINTA POTRERO", "OJO DE BIFE – BRAFORD (VICTORIA)", "BIFE DE CHORIZO – PUL SELECCIÓN", "BIFE DE CHORIZO – ESTANCIA 92 ANGUS", "BIFE DE CHORIZO – ESTANCIA 92", "BIFE DE CHORIZO - DON PEPE", "BIFE DE CHORIZO - FRIGOCHACO", "BIFE DE CHORIZO - NEULAND", "BIFE DE CHORIZO - CAMPO 9", "BIFE DE CHORIZO - VICTORIA", "BIFE DE VACÍO - PUL SELECCIÓN", "COLITA CUADRIL - CHORTI", "COLITA CUADRIL – QUINTA POTRERO", "COLITA CUADRIL – BRAFORD (VICTORIA)", "COLITA CUADRIL – ESTANCIA 92 ANGUS", "COLITA CUADRIL - CONCEPCIÓN", "COLITA CUADRIL - DON PEPE", "COLITA CUADRIL - FRIGOCHACO", "COLITA CUADRIL - NEULAND", "COLITA CUADRIL - PAMPA GOLD", "COLITA CUADRIL - PUL SELECCIÓN", "COSTILLA - ESTANCIA 92 ANGUS", "COSTILLA ESPECIAL - NEULAND", "COSTILLA TIRA ANCHA - DON PEPE", "COSTILLA PAMPA GOLD - FRIGOCHACO", "COSTILLA POPULAR - NEULAND", "COSTILLA SEMI ANCHA - PUL SELECCION", "COSTILLA TIRA ANCHA - VICTORIA", "COSTILLA TIRA FINA - CAMPO 9", "ENTRECOSTILLA - CHORTI", "ENTRECOSTILLA – FRIGOCHACO", "ENTRECOSTILLA - NEULAND", "TAPA CUADRIL - CHORTI", "TAPA CUADRIL - CONCEPCIÓN", "TAPA CUADRIL - DON PEPE", "TAPA CUADRIL - FRIGOCHACO", "TAPA CUADRIL - NEULAND", "TAPA CUADRIL - VICTORIA", "TAPA CUADRIL - ESTANCIA 92 ANGUS", "TAPA CUADRIL - PUL SELECCION", "VACÍO - CHORTI", "VACÍO - CONCEPCIÓN", "VACÍO - DON PEPE", "VACÍO - FRIGOCHACO", "VACÍO - NEULAND", "VACÍO - ESTANCIA 92 ANGUS", "VACÍO - PUL SELECCION", "LOMITO - PAMPA GOLD", "LOMITO - DON PEPE", "LOMITO - NEULAND", "LOMITO - CHORTI", "PECETO - CHORTI", "PECETO - NEULAND", "PECETO - VICTORIA", "CUPIM - NEULAND", "CUPIM - PUL SELECCIÓN", "CUPIM - CHORTI"];
+    // LISTA COMPLETA DE CORTES (200+)
+    const cortes = ["BIFE DE CHORIZO - CHORTI", "TAPA NEULAND - ESPECIAL", "VACIO ESPECIAL - NEULAND", "TAPA EPP - NEULAND", "COLITA EPP - NEULAND", "COSTILLA EPP - NEULAND", "VACIO EPP - NEULAND", "TAPA CUADRIL - GUARANI", "COLITA CUADRIL - GUARANI", "BIFE ANCHO - GUARANI", "PUNTA DE PECHO - NEULAND", "BRISCKET - NEULAND", "PICADA PARRILLERA - PUL SELECCIÓN", "PICADA PARRILLERA - NEULAND", "VACIO GRILL - VICTORIA", "COLITA GILL - VICTORIA", "PECETO - PUL REGULAR", "TAPA CUADRIL - DEL CAMPO", "COLITA - DEL CAMPO", "VACIO - DEL CAMPO", "ENTRECOSTILLA - DEL CAMPO", "ENTRAÑA FINA - DEL CAMPO", "BIFE DE VACIO - NEULAND", "RECORTES DE LOMITO - VICTORIA", "RECORTES DE LOMITO - PUL SELECCIÓN", "COSTILLA FINA - VICTORIA", "BIFE ANCHO - DEL CAMPO", "LOMITO - DEL CAMPO", "BIFE DE CHORIZO - CHORTI", "BIFE ANCHO - CHORTI", "LOMITO - CAMPO 9", "LOMITO - QUINTO POTRERO", "TIRA FINA - QUINTA POTRERO", "OJO DE BIFE - QUINTA POTRERO", "COSTILLA FINA - VICTORIA", "COSTILLA SIN HUESO - PAMPA GOLD", "COSTILLA SIN HUESO - DON PEPE", "BIFE DE CHORIZO – PAMPA GOLD", "BIFE DE CHORIZO – FERHEIM", "BIFE DE CHORIZO - CONCEPCIÓN", "BIFE DE CHORIZO – QUINTA POTRERO", "OJO DE BIFE – BRAFORD (VICTORIA)", "BIFE DE CHORIZO – PUL SELECCIÓN (ETIQUETA NEGRA)", "BIFE DE CHORIZO – ESTANCIA 92 ANGUS", "BIFE DE CHORIZO – ESTANCIA 92", "BIFE DE CHORIZO - DON PEPE", "BIFE DE CHORIZO - FRIGOCHACO", "BIFE DE CHORIZO - NEULAND", "BIFE DE CHORIZO - CAMPO 9", "BIFE DE CHORIZO - VICTORIA", "BIFE DE VACÍO - PUL SELECCIÓN (ETIQUETA NEGRA)", "BIFE ANCHO - PUL REGULAR (ETIQUETA AZUL)", "COLITA CUADRIL - CHORTI", "COLITA CUADRIL – QUINTA POTRERO", "COLITA CUADRIL – BRAFORD (VICTORIA)", "COLITA CUADRIL – ESTANCIA 92 (SOLO ESTANCIA)", "COLITA CUADRIL – ESTANCIA 92 ANGUS", "COLITA CUADRIL - CONCEPCIÓN", "COLITA CUADRIL - DON PEPE", "COLITA CUADRIL - FRIGOCHACO", "COLITA CUADRIL - GOOD BEEF CONCEPCIÓN", "COLITA CUADRIL - NEULAND", "COLITA CUADRIL - PAMPA GOLD", "COLITA CUADRIL - PUL REGULAR (ETIQUETA AZUL)", "COLITA CUADRIL - PUL SELECCIÓN (ETIQUETA NEGRA)", "COLITA CUADRIL PREMIUM - CHORTI", "COLITA CUADRIL TIPO A - CHORTI", "COLITA CUADRIL - CAMPO 9", "COLITA CUADRIL - VICTORIA", "COSTILLA - ESTANCIA 92 ANGUS", "COSTILLA ESPECIAL - NEULAND", "COSTILLA TIRA ANCHA - DON PEPE", "COSTILLA CORTE PLATO - DON PEPE", "COSTILLA TIRA FINA - DON PEPE", "COSTILLA PAMPA GOLD - FRIGOCHACO", "COSTILLA AL PLATO PAMPA GOLD - FRIGOCHACO", "COSTILLA TIRA FINA PAMPA GOLD - FRIGOCHACO", "COSTILLA AL PLATO – NELORE ESTRELLITA", "COSTILLA POPULAR - NEULAND", "COSTILLA SEMI ANCHA - PUL REGULAR", "COSTILLA SEMI ANCHA - PUL SELECCION", "COSTILLA TIRA ANCHA - VICTORIA", "COSTILLA TIRA ANCHA - BRAFORD (VICTORIA)", "COSTILLA TIRA ANCHA - QUINTA POTRERO", "COSTILLA TIRA FINA – NELORE ESTRELLITA", "COSTILLA TIRA FINA - CAMPO 9", "COSTILLA PREMIUM - CAMPO 9", "COSTILLA ANCHA - CAMPO 9", "TIRA DE COSTILLA - ESTANCIA 92 ANGUS", "ENTRECOSTILLA - CHORTI", "ENTRECOSTILLA – FRIGOCHACO", "ENTRECOSTILLA - NEULAND", "ENTRECOSTILLA – QUINTA POTRERO", "ENTRECOSTILLA – NELORE ESTRELLITA", "ENTRECOSTILLA - ESTANCIA 92 ANGUS", "STEAK DE CHORIZO - ESTANCIA 92", "PUNTA DE COSTILLA - PUL SELECCION", "TAPA CUADRIL - CHORTI", "TAPA CUADRIL - CONCEPCIÓN", "TAPA CUADRIL - DON PEPE", "TAPA CUADRIL - FRIGOCHACO", "TAPA CUADRIL – NELORE ESTRELLITA", "TAPA CUADRIL - NEULAND", "TAPA CUADRIL - VICTORIA", "TAPA CUADRIL – BRAFORD (VICTORIA)", "TAPA CUADRIL – QUINTA POTRERO", "TAPA CUADRIL - ESTANCIA 92 ANGUS", "TAPA CUADRIL - ESTANCIA 92", "TAPA CUADRIL - PUL REGULAR", "TAPA CUADRIL - PUL SELECCION", "TAPA CUADRIL FETEADA - PUL SELECCION", "TAPA CUADRIL - PAMPA GOLD", "TAPA CUADRIL FETEADA - CHORTI", "TAPA CUADRIL FETEADA -  CONCEPCION", "TAPA CUADRIL POPULAR - NEULAND", "TAPA CUADRIL PREMIUM - CHORTI", "TAPA CUADRIL TIPO A - CHORTI", "TAPA CUADRIL - CAMPO 9", "TAPA DE ASADO (TAPA DE BIFE/PLATEADA) - PUL SELECCION -", "VACÍO - CHORTI", "VACÍO - CONCEPCIÓN", "VACÍO - DON PEPE", "VACÍO - FRIGOCHACO", "VACÍO – NELORE ESTRELLITA", "VACÍO - NEULAND", "VACÍO POPULAR - NEULAND", "VACÍO - QUINTA POTRERO", "VACÍO - FERHEIM", "VACÍO - ESTANCIA 92 ANGUS", "VACÍO – ESTANCIA 92", "VACÍO - PUL REGULAR", "VACÍO - PUL SELECCION", "VACÍO PAMPA GOLD - FRIGOCHACO", "VACÍO - VICTORIA", "VACÍO – BRAFORD (VICTORIA)", "LOMITO - PAMPA GOLD", "LOMITO - DON PEPE", "LOMITO - NEULAND", "LOMITO - CHORTI", "LOMITO - PUL REGULAR", "LOMITO - NELORE ESTRELLITA", "PECETO - NELORE ESTRELLITA", "PECETO - CHORTI", "PECETO - NEULAND", "PECETO - VICTORIA", "CUPIM - NEULAND", "CUPIM - PUL SELECCIÓN", "CUPIM - CHORTI", "CUPIM - VICTORIA", "CUPIM - NELORE ESTRELLITA", "CUPIM - FRIGOCHACO"];
 
-    function renderCortes() {
-        const contenedor = document.getElementById('lista-cortes');
-        contenedor.innerHTML = cortes.slice().sort().map(c => `
-            <div class="item-carne">
-                <span>${c}</span>
-                <div class="precios-row">
-                    <div class="price-field">
-                        <small>PRECIO REGULAR</small>
-                        <input type="number" class="p-reg" placeholder="0" inputmode="numeric">
-                    </div>
-                    <div class="price-field">
-                        <small>PRECIO OFERTA</small>
-                        <input type="number" class="p-ofe" placeholder="0" inputmode="numeric">
-                    </div>
-                </div>
-            </div>
-        `).join('');
+    // ── Custom dropdown logic RELEVADOR ───────────────────────────────
+    let relevadorDropdownOpen = false;
+
+    function toggleRelevadorDropdown() {
+        relevadorDropdownOpen ? cerrarRelevadorDropdown() : abrirRelevadorDropdown();
     }
 
-    function filtrar() {
-        const query = document.getElementById('buscador').value.toLowerCase();
-        document.querySelectorAll('.item-carne').forEach(item => {
-            const text = item.querySelector('span').innerText.toLowerCase();
-            item.style.display = text.includes(query) ? 'block' : 'none';
-        });
+    function abrirRelevadorDropdown() {
+        relevadorDropdownOpen = true;
+        document.getElementById('relevador-gen-dropdown').classList.add('open');
+        const search = document.getElementById('relevador-gen-search');
+        search.value = '';
+        filtrarRelevadoresDropdown();
+        setTimeout(() => search.focus(), 50);
     }
+
+    function cerrarRelevadorDropdown() {
+        relevadorDropdownOpen = false;
+        document.getElementById('relevador-gen-dropdown').classList.remove('open');
+    }
+
+    function filtrarRelevadoresDropdown() {
+        const q = document.getElementById('relevador-gen-search').value.toLowerCase();
+        const lista = document.getElementById('relevador-gen-list');
+        const filtrados = relevadores_gen.slice().sort().filter(r => r.toLowerCase().includes(q));
+        if (filtrados.length === 0) {
+            lista.innerHTML = '<div class="custom-select-option no-result">Sin resultados</div>';
+            return;
+        }
+        lista.innerHTML = filtrados.map(r =>
+            `<div class="custom-select-option" onclick="seleccionarRelevador('${r.replace(/'/g, "\\'")}')">${r}</div>`
+        ).join('');
+    }
+
+    function seleccionarRelevador(valor) {
+        document.getElementById('relevador_gen').value = valor;
+        const text = document.getElementById('relevador-gen-text');
+        text.textContent = valor;
+        document.getElementById('relevador-gen-display').classList.remove('placeholder');
+        cerrarRelevadorDropdown();
+    }
+
+    // Cerrar relevador al hacer click fuera
+    document.addEventListener('click', function(e) {
+        const wrapper = document.getElementById('relevador-gen-wrapper');
+        if (wrapper && !wrapper.contains(e.target)) {
+            cerrarRelevadorDropdown();
+        }
+    });
+    // ──────────────────────────────────────────────────────────────────
+
+    // ── Custom dropdown logic LOCAL ────────────────────────────────────
+    let localDropdownOpen = false;
+
+    function toggleLocalDropdown() {
+        localDropdownOpen ? cerrarLocalDropdown() : abrirLocalDropdown();
+    }
+
+    function abrirLocalDropdown() {
+        localDropdownOpen = true;
+        document.getElementById('local-gen-dropdown').classList.add('open');
+        const search = document.getElementById('local-gen-search');
+        search.value = '';
+        filtrarLocalesDropdown();
+        setTimeout(() => search.focus(), 50);
+    }
+
+    function cerrarLocalDropdown() {
+        localDropdownOpen = false;
+        document.getElementById('local-gen-dropdown').classList.remove('open');
+    }
+
+    function filtrarLocalesDropdown() {
+        const q = document.getElementById('local-gen-search').value.toLowerCase();
+        const lista = document.getElementById('local-gen-list');
+        const filtrados = locales_gen.slice().sort().filter(l => l.toLowerCase().includes(q));
+        if (filtrados.length === 0) {
+            lista.innerHTML = '<div class="custom-select-option no-result">Sin resultados</div>';
+            return;
+        }
+        lista.innerHTML = filtrados.map(l =>
+            `<div class="custom-select-option" onclick="seleccionarLocal('${l.replace(/'/g, "\\'")}')">${l}</div>`
+        ).join('');
+    }
+
+    function seleccionarLocal(valor) {
+        document.getElementById('local_gen').value = valor;
+        const display = document.getElementById('local-gen-display');
+        const text = document.getElementById('local-gen-text');
+        text.textContent = valor;
+        display.classList.remove('placeholder');
+        cerrarLocalDropdown();
+    }
+
+    // Cerrar al hacer click fuera
+    document.addEventListener('click', function(e) {
+        const wrapper = document.getElementById('local-gen-wrapper');
+        if (wrapper && !wrapper.contains(e.target)) {
+            cerrarLocalDropdown();
+        }
+    });
+    // ──────────────────────────────────────────────────────────────────
 
     function switchModo(modo) {
         modoActual = modo;
-        document.getElementById('section-gen').classList.toggle('hidden', modo !== 'gen');
-        document.getElementById('section-big').classList.toggle('hidden', modo !== 'big');
-        document.getElementById('tab-gen').className = modo === 'gen' ? 'tab active-gen' : 'tab';
-        document.getElementById('tab-big').className = modo === 'big' ? 'tab active-big' : 'tab';
+        document.getElementById('tab-gen').className = (modo === 'gen') ? 'tab active-gen' : 'tab';
+        document.getElementById('tab-big').className = (modo === 'big') ? 'tab active-big' : 'tab';
+        document.getElementById('section-gen').className = (modo === 'gen') ? 'card' : 'card hidden';
+        document.getElementById('section-big').className = (modo === 'big') ? 'card' : 'card hidden';
     }
 
-    function toggleRelevadorDropdown() { document.getElementById('relevador-gen-dropdown').classList.toggle('open'); filtrarRelevadoresDropdown(); }
-    function filtrarRelevadoresDropdown() {
-        const q = document.getElementById('relevador-gen-search').value.toLowerCase();
-        const list = document.getElementById('relevador-gen-list');
-        list.innerHTML = relevadores_gen.filter(r => r.toLowerCase().includes(q)).map(r => `<div class="custom-select-option" onclick="seleccionarRelevador('${r}')">${r}</div>`).join('');
-    }
-    function seleccionarRelevador(v) { document.getElementById('relevador_gen').value = v; document.getElementById('relevador-gen-text').innerText = v; document.getElementById('relevador-gen-dropdown').classList.remove('open'); }
+    function validarInput(input) {
+        const val = input.value;
+        const parent = input.closest('.precios-row');
+        const isOferta = input.classList.contains('p-ofe') || input.classList.contains('n-precio');
+        const errorSpan = input.parentElement.querySelector('.error-msg');
+        
+        if (val.length > 0 && (val.length < 5 || val.length > 6)) {
+            errorSpan.innerText = "Debe tener 5 o 6 números";
+            input.classList.add('input-error');
+            return;
+        }
 
-    function toggleLocalDropdown() { document.getElementById('local-gen-dropdown').classList.toggle('open'); filtrarLocalesDropdown(); }
-    function filtrarLocalesDropdown() {
-        const q = document.getElementById('local-gen-search').value.toLowerCase();
-        const list = document.getElementById('local-gen-list');
-        list.innerHTML = locales_gen.filter(l => l.toLowerCase().includes(q)).map(l => `<div class="custom-select-option" onclick="seleccionarLocal('${l}')">${l}</div>`).join('');
-    }
-    function seleccionarLocal(v) { document.getElementById('local_gen').value = v; document.getElementById('local-gen-text').innerText = v; document.getElementById('local-gen-dropdown').classList.remove('open'); }
+        if (parent && isOferta) {
+            const regInput = parent.querySelector('.p-reg') || {value: 0}; 
+            const valReg = parseFloat(regInput.value) || 0;
+            const valOff = parseFloat(val) || 0;
 
-    function cargarRelevadoresBiggie() {
-        const sel = document.getElementById('relevador_biggie');
-        Object.keys(datos_biggie).sort().forEach(r => sel.innerHTML += `<option value="${r}">${r}</option>`);
-    }
+            if (valOff > 0 && valReg > 0 && valOff > valReg) {
+                errorSpan.innerText = "Oferta no puede ser mayor";
+                input.classList.add('input-error');
+                return;
+            }
+        }
 
-    function cargarLocalesBiggie(r) {
-        const sel = document.getElementById('local_biggie');
-        sel.innerHTML = '<option value="">-- Selecciona Local --</option>';
-        if(datos_biggie[r]) datos_biggie[r].sort().forEach(l => sel.innerHTML += `<option value="${l}">${l}</option>`);
+        errorSpan.innerText = "";
+        input.classList.remove('input-error');
     }
 
-    // ── FUNCIÓN MODIFICADA: agrega botón × para eliminar la tarjeta ──
+    function inicializarApp() {
+        document.getElementById('dl-relevadores') && (document.getElementById('dl-relevadores').innerHTML = relevadores_gen.map(r => `<option value="${r}">`).join(""));
+        // Inicializar dropdown de relevador
+        filtrarRelevadoresDropdown();
+        // Inicializar lista del dropdown de locales
+        filtrarLocalesDropdown();
+        const selBig = document.getElementById('relevador_biggie');
+        Object.keys(datos_biggie).sort().forEach(r => {
+            let opt = document.createElement('option'); opt.value = r; opt.innerText = r;
+            selBig.appendChild(opt);
+        });
+        const contCortes = document.getElementById('lista-cortes');
+        cortes.sort().forEach(c => {
+            const div = document.createElement('div');
+            div.className = 'item-carne';
+            div.innerHTML = `<span>${c}</span>
+                <div class="precios-row">
+                    <div class="price-field">
+                        <small>P. REGULAR</small>
+                        <input type="number" inputmode="decimal" class="p-reg" placeholder="0" oninput="validarInput(this)">
+                        <span class="error-msg"></span>
+                    </div>
+                    <div class="price-field">
+                        <small>P. OFERTA</small>
+                        <input type="number" inputmode="decimal" class="p-ofe" placeholder="0" oninput="validarInput(this)">
+                        <span class="error-msg"></span>
+                    </div>
+                </div>`;
+            contCortes.appendChild(div);
+        });
+    }
+
+    function cargarLocalesBiggie(nombre) {
+        const selLocal = document.getElementById('local_biggie');
+        selLocal.innerHTML = '<option value="">-- Selecciona Local --</option>';
+        if(nombre && datos_biggie[nombre]) {
+            datos_biggie[nombre].sort().forEach(l => {
+                let opt = document.createElement('option'); opt.value = l; opt.innerText = l;
+                selLocal.appendChild(opt);
+            });
+        }
+    }
+
     function agregarCampoNuevoCorte() {
+        const id = Date.now();
         const div = document.createElement('div');
-        div.className = 'card nuevo-corte-item';
-        div.innerHTML = `
-            <button class="btn-eliminar-corte" onclick="this.closest('.nuevo-corte-item').remove()" title="Eliminar">&times;</button>
-            <input type="text" class="n-nombre" placeholder="Nombre Producto">
-            <input type="number" class="n-precio" placeholder="Precio">
-            <input type="text" class="n-marca" placeholder="Marca">
-        `;
+        div.className = 'nuevo-corte-item';
+        div.id = `nuevo-${id}`;
+        div.style = "background: #fff8e1; border: 2px dashed var(--secondary); padding: 15px; border-radius: 10px; margin-top: 10px; position: relative;";
+        div.innerHTML = `<i class="material-icons" style="position: absolute; top: 5px; right: 5px; color: #d32f2f; cursor: pointer;"
+            onclick="this.parentElement.remove()">cancel</i>
+            <label>Nombre Producto Nuevo</label><input type="text" class="n-nombre" placeholder="Nombre...">
+            <div class="precios-row">
+                <div class="price-field"><small>MARCA</small><input type="text" class="n-marca" placeholder="Marca..."></div>
+                <div class="price-field">
+                    <small>PRECIO</small>
+                    <input type="number" inputmode="decimal" class="n-precio" placeholder="Gs." oninput="validarInput(this)">
+                    <span class="error-msg"></span>
+                </div>
+            </div>`;
         document.getElementById('contenedor-nuevos').appendChild(div);
     }
 
-    async function guardar() {
-        alert("Enviando relevamiento...");
-        // Aquí va tu función de fetch a Google Apps Script
+    function filtrar() {
+        const t = document.getElementById('buscador').value.toLowerCase();
+        document.querySelectorAll('.item-carne').forEach(i => {
+            i.style.display = i.querySelector('span').innerText.toLowerCase().includes(t) ? 'block' : 'none';
+        });
     }
 
-    window.onload = () => {
-        renderCortes();
-        cargarRelevadoresBiggie();
-    };
-</script>
+    async function guardar() {
+        const url = "https://script.google.com/macros/s/AKfycbwW_-E1Poz6TUcrE8UjMhjg0edRP3k7Bbh8MUKzr27Tn5ss3NOKES5UNJGE8xsiAtZKUQ/exec";
+        const btn = document.getElementById('btn-envio');
+        let relevador, local;    
+        
+        if(modoActual === 'gen') {
+            relevador = document.getElementById('relevador_gen').value;
+            local = document.getElementById('local_gen').value;
 
+            // Validar que el local sea de la lista oficial
+            if (local && !locales_gen.includes(local)) {
+                return alert("El local ingresado no es válido. Por favor seleccioná uno de la lista.");
+            }
+        } else {
+            relevador = document.getElementById('relevador_biggie').value;
+            local = document.getElementById('local_biggie').value;
+        }
+
+        const items = [];
+        let hayErrores = false;
+
+        document.querySelectorAll('.error-msg').forEach(span => {
+            if(span.innerText !== "") hayErrores = true;
+        });
+
+        if(hayErrores) return alert("Corrige los errores en rojo antes de enviar.");
+
+        document.querySelectorAll('.item-carne').forEach(div => {
+            const nombre = div.querySelector('span').innerText;
+            const valorReg = div.querySelector('.p-reg').value;
+            const valorOff = div.querySelector('.p-ofe').value;
+            if(valorReg || valorOff) {
+                items.push({ corte: nombre, precioReg: valorReg || 0, precioOff: valorOff || 0, esNuevo: false });
+            }
+        });
+
+        document.querySelectorAll('.nuevo-corte-item').forEach(div => {
+            const nom = div.querySelector('.n-nombre').value;
+            const pre = div.querySelector('.n-precio').value;
+            const mar = div.querySelector('.n-marca').value;
+            if(nom && pre) items.push({ corte: nom, precioReg: pre, marca: mar, esNuevo: true });
+        });
+
+        if(!relevador || !local || items.length === 0) return alert("Completa Relevador, Local y carga algún precio.");
+
+        btn.disabled = true;
+        btn.innerHTML = "ENVIANDO...";
+
+        const categoriaFinal = (modoActual === 'big') ? 'BIGGIE' : 'GENERAL';
+        try {
+            await fetch(url, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                body: JSON.stringify({ 
+                    fecha: new Date().toLocaleString(), relevador: relevador, local: local, categoria: categoriaFinal, items: items 
+                }) 
+            });
+            alert("¡Relevamiento enviado con éxito!");
+            location.reload();
+        } catch(e) { 
+            alert("Error de envío. Revisa tu conexión.");
+            btn.disabled = false;
+            btn.innerHTML = "ENVIAR RELEVAMIENTO";
+        }
+    }
+
+    window.addEventListener('load', inicializarApp);
+</script>
 </body>
 </html>
